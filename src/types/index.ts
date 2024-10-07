@@ -1,5 +1,5 @@
 
-export interface IProduct {
+export interface ICard {
     id: string;
     description: string;
     image: string;
@@ -8,15 +8,15 @@ export interface IProduct {
     price: number
 }
 
-export interface IProductData {
-    products: IProduct[];
+export interface ICardData {
+    products: ICard[];
     selectedProduct: string | null;
-    getProduct(id: string): IProduct;
+    getProduct(id: string): ICard;
 }
 
 export interface IBasket {
     isEmpty: boolean;
-    products: IProduct[];
+    products: ICard[];
     count: string;
     cost: number;
 }
@@ -24,7 +24,7 @@ export interface IBasket {
 export interface IBasketData {
     basket: IBasket;
     productToDelete: string;
-    addProduct(product: IProduct): void;
+    addProduct(product: ICard): void;
     removeProduct(id: string): void;
     getProductInfo(): TProductBasket;
     checkProductStatus(id: string): boolean;
@@ -39,30 +39,18 @@ export interface IOrder {
     product: TProductOrder[];
 }
 
-export interface IOrderResult {
-
-}
-
 export interface IOrderData {
     order: IOrder;
-    status: IOrderResult;
+    status: string | null;
     isOrderValid: boolean;
     checkValidation(data: Record<keyof TOrderValidation, string>): boolean;
-    getOrder(): IOrder;
-    getOrderStatus(order: IOrder): Promise<IOrderResult>;
+    sendOrder(order: IOrder): void;
 }
 
 
-export type TProductBaseInfo = Pick<IProduct, 'image' | 'title' | 'category' | 'price'>;
-export type TProductModal = Pick<IProduct, 'description' | 'image' | 'title' | 'category' | 'price'>;
-export type TProductBasket = Pick<IProduct, 'title' | 'price' | 'id'>;
-export type TProductOrder = Pick<IProduct, 'id'>;
+export type TProductBase = Pick<ICard, 'image' | 'title' | 'category' | 'price'>;
+export type TProductModal = Pick<ICard, 'description' | 'image' | 'title' | 'category' | 'price'>;
+export type TProductBasket = Pick<ICard, 'title' | 'price' | 'id'>;
+export type TProductOrder = Pick<ICard, 'id'>;
 export type TOrderValidation = Pick<IOrder, 'payment' | 'address' | 'email' | 'phone'>;
-// export type TOrderPayment = Pick<IOrder, 'payment' | 'address'>;
-// export type TOrderEmail = Pick<IOrder, 'email' | 'phone'>;
 
-
-
-export interface IModal {
-
-}
