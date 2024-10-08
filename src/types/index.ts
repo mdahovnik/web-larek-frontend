@@ -9,14 +9,14 @@ export interface ICard {
 }
 
 export interface ICardData {
-    products: ICard[];
+    cardsList: ICard[];
     selectedProduct: string | null;
     getProduct(id: string): ICard;
 }
 
 export interface IBasket {
     isEmpty: boolean;
-    products: ICard[];
+    cardsList: ICard[];
     count: string;
     cost: number;
 }
@@ -26,17 +26,20 @@ export interface IBasketData {
     productToDelete: string;
     addProduct(product: ICard): void;
     removeProduct(id: string): void;
-    getProductInfo(): TProductBasket;
+    getProductInfo(): TCardBasket;
     checkProductStatus(id: string): boolean;
 }
 
-export interface IOrder {
-    payment: string;
+export interface IContacts {
     email: string;
     phone: string;
+}
+
+export interface IOrder extends IContacts {
+    payment: string;
     address: string;
     total: number;
-    product: TProductOrder[];
+    product: TCardOrder[];
 }
 
 export interface IOrderData {
@@ -47,10 +50,15 @@ export interface IOrderData {
     sendOrder(order: IOrder): void;
 }
 
+export interface IOrderResult {
+    id: string;
+    total: number;
+}
 
-export type TProductBase = Pick<ICard, 'image' | 'title' | 'category' | 'price'>;
-export type TProductModal = Pick<ICard, 'description' | 'image' | 'title' | 'category' | 'price'>;
-export type TProductBasket = Pick<ICard, 'title' | 'price' | 'id'>;
-export type TProductOrder = Pick<ICard, 'id'>;
+export type TCardBase = Pick<ICard, 'image' | 'title' | 'category' | 'price'>;
+export type TCardModal = Pick<ICard, 'description' | 'image' | 'title' | 'category' | 'price'>;
+export type TCardBasket = Pick<ICard, 'title' | 'price' | 'id'>;
+export type TCardOrder = Pick<ICard, 'id'>;
 export type TOrderValidation = Pick<IOrder, 'payment' | 'address' | 'email' | 'phone'>;
-
+export type TOrderPayment = Pick<IOrder, 'payment' | 'address'>;
+export type TOrderContacts = Pick<IOrder, 'email' | 'phone'>;
