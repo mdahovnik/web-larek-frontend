@@ -1,33 +1,32 @@
+import { ApiPostMethods } from "../components/base/api";
 
 export interface ICard {
-    id: string;
-    description: string;
-    image: string;
-    title: string;
     category: string;
-    price: number
+    description: string;
+    id: string;
+    image: string;
+    price: number;
+    title: string;
 }
 
-export interface ICardData {
+export interface ICardsData {
     cardsList: ICard[];
-    selectedProduct: string | null;
-    getProduct(id: string): ICard;
+    selectedCard: string | null;
+    getCard(id: string): ICard;
 }
 
 export interface IBasket {
-    isEmpty: boolean;
-    cardsList: ICard[];
-    count: string;
+    // isEmpty: boolean;
+    // count: string;
     cost: number;
 }
 
 export interface IBasketData {
     basket: IBasket;
-    productToDelete: string;
-    addProduct(product: ICard): void;
+    basketList: ICard[];
+    toRemove: string;
+    addProduct(card: ICard): void;
     removeProduct(id: string): void;
-    getProductInfo(): TCardBasket;
-    checkProductStatus(id: string): boolean;
 }
 
 export interface IContacts {
@@ -50,10 +49,14 @@ export interface IOrderData {
     sendOrder(order: IOrder): void;
 }
 
-export interface IOrderResult {
-    id: string;
-    total: number;
+
+export interface IApi {
+    get<T>(url: string): Promise<T>;
+    post<T>(uri: string, data: object, method?: ApiPostMethods): Promise<T>;
 }
+
+export type IOrderResult = { id: string, total: number }
+export type TInitCards = { total: number, items: ICard[] };
 
 export type TCardBase = Pick<ICard, 'image' | 'title' | 'category' | 'price'>;
 export type TCardModal = Pick<ICard, 'description' | 'image' | 'title' | 'category' | 'price'>;
