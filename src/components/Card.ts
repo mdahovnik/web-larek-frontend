@@ -6,9 +6,8 @@ import { Component } from "./base/Component";
 
 
 export class Card extends Component<ICard> {
-    // protected container: HTMLElement;
-    protected events: IEvents;
 
+    protected events: IEvents;
     protected cardCategory?: HTMLSpanElement;
     protected cardTitle: HTMLTitleElement;
     protected cardImage?: HTMLImageElement;
@@ -18,9 +17,8 @@ export class Card extends Component<ICard> {
 
     constructor(protected container: HTMLElement, events: IEvents) {
         super(container);
-        // this.element = cloneTemplate(template);
-        this.events = events;
 
+        this.events = events;
         this.cardCategory = this.container.querySelector('.card__category');
         this.cardTitle = this.container.querySelector('.card__title');
         this.cardImage = this.container.querySelector('.card__image');
@@ -28,13 +26,26 @@ export class Card extends Component<ICard> {
         this.cardText = this.container.querySelector('.card__text');
         this.button = this.container.querySelector('.card__button');
 
-        this.button?.addEventListener('click', () => {
-            this.events.emit('card-basket:added', { card: this });
-        });
+        if (this.cardText) {
+            this.actionOnClick('card-basket:added', this.button);
+            // this.button.addEventListener('click', () => {
+            //     this.events.emit('card-basket:added', { card: this });
+            // });
+        }
 
-        this.container.addEventListener('click', () => {
-            this.events.emit('card-preview:changed', { card: this });
-        });
+        if (!this.button) {
+            this.actionOnClick('card-preview:changed', this.container);
+            // this.container.addEventListener('click', () => {
+            //     this.events.emit('card-preview:changed', { card: this });
+            // });
+        }
+
+        if (!this.cardCategory) {
+            this.actionOnClick('card-basket:remove', this.button);
+            // this.button.addEventListener('click', () => {
+            //     this.events.emit('card-basket:remove', { card: this });
+            // });
+        }
     }
 
     set category(category: string) {
@@ -69,12 +80,10 @@ export class Card extends Component<ICard> {
     //         this.cardText.textContent = text;
     // }
 
-    render(data: Partial<ICard>) {
-        // console.log(data);
-
-        Object.assign(this, data);
-
-        return this.container;
+    actionOnClick(event: string, element: HTMLElement) {
+        element.addEventListener('click', () => {
+            this.events.emit(event, { card: this });
+        });
     }
 
 }

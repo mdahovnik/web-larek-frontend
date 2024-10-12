@@ -17,14 +17,18 @@ const events = new EventEmitter();
 const baseApi = new Api(API_URL);
 const api = new LarekAPI(baseApi);
 
+const page = new Page(ensureElement('.page__wrapper'), events);
 const modal = new Modal(ensureElement('#modal-container'), events);
+
+const basketTemplate = cloneTemplate('#basket');
+const cardPreviewTemplate = cloneTemplate('#card-preview');
 
 const cardsData = new CardsData(events);
 const basketData = new BasketData(events);
+const basket = new Basket(basketTemplate, events);
 
 
-const container = document.querySelector('.page__wrapper') as HTMLElement;
-const page = new Page(container, events);
+const galleryItems: HTMLElement[] = [];
 
 events.onAll((event) => {
     console.log(event.eventName, event.data);
@@ -33,16 +37,15 @@ events.onAll((event) => {
 /**
  * получение данных с сервера
  */
-const elements: HTMLElement[] = [];
 api.getProductList<TInitCards>().then(obj => {
     cardsData.cardsList = obj.items;
 
-    cardsData.cardsList.forEach((item) => {
-        const card = new Card(cloneTemplate('#card-catalog'), events);
-        elements.push(card.render(item));
+    cardsData.cardsList.forEach((cardData) => {
+        const newCard = new Card(cloneTemplate('#card-catalog'), events);
+        galleryItems.push(newCard.render(cardData));
     });
 
-    page.render({ gallery: elements, count: basketData.total })
+    page.render({ gallery: galleryItems, count: basketData.total })
 }).catch(err => console.error(err))
 
 
@@ -51,7 +54,7 @@ api.getProductList<TInitCards>().then(obj => {
  * просмотр карточки
  */
 events.on('card-preview:changed', (data: { card: ICard }) => {
-    const card = new Card(cloneTemplate('#card-preview'), events);
+    const card = new Card(cardPreviewTemplate, events);
     const newCardElement = card.render(cardsData.getCard(data.card.id));
     modal.render({ content: newCardElement });
 })
@@ -60,27 +63,32 @@ events.on('card-preview:changed', (data: { card: ICard }) => {
 /**
  * Корзина
  */
-const basketTemplate = cloneTemplate('#basket');
-const basket = new Basket(basketTemplate, events);
-const list = basketTemplate.querySelector('.basket__list') as HTMLElement;
-
-// добавление в корзину
 events.on('card-basket:added', (data: { card: ICard }) => {
-    basketData.addProduct(cardsData.getCard(data.card.id));
-    const card = new Card(cloneTemplate('#card-basket'), events);
-
-    basketData.basketList.forEach((item) => {
-        list.prepend(card.render(cardsData.getCard(item.id)));
-    });
-
-    page.render({ gallery: elements, count: basketData.total });
-    modal.close();
+    basketData.add(cardsData.getCard(data.card.id));
+    page.render({ gallery: galleryItems, count: basketData.total });
 })
 
-events.on('basket: open', () => {
 
-    basket.render({cost: basketData.cost})
-    modal.render({ content: basketTemplate});
+events.on('card-basket:remove', (data: { card: ICard }) => {
+    basketData.remove(data.card);
+})
+
+
+events.on('basket:changed', (data: { cards: ICard[] }) => {
+    const cardsList: HTMLElement[] = [];
+ 
+    data.cards.forEach((item) => {
+        const newCard = new Card(cloneTemplate('#card-basket'), events);
+        cardsList.push(newCard.render(cardsData.getCard(item.id)));
+    });
+
+    basket.render({ cost: basketData.cost, cards: cardsList });
+    page.render({ gallery: galleryItems, count: basketData.total });
+})
+
+
+events.on('basket: open', () => {
+    modal.render({ content: basketTemplate });
 })
 
 

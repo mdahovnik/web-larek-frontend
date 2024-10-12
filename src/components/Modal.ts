@@ -19,18 +19,22 @@ export class Modal extends Component<IModalContent> {
         this.container.addEventListener('click', this.close.bind(this));
         this._content.addEventListener('click', (evt) => {
             evt.stopPropagation();
-        })
+        });
+
+        this.events.on('modal:close', this.close.bind(this));
     }
 
     open() {
         this.container.classList.add('modal_active');
         this.container.classList.add('page__wrapper_locked');
-
+        // console.log(this.container.classList.contains('modal_active'));
     }
 
     close() {
+        
         this.container.classList.remove('modal_active');
         this.container.classList.remove('page__wrapper_locked');
+        console.log(this.container.classList.contains('modal_active'));
         // this.content = null;
     }
 

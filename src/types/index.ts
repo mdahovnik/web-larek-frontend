@@ -16,17 +16,14 @@ export interface ICardsData {
 }
 
 export interface IBasket {
-    // isEmpty: boolean;
-    // count: string;
+    cards: HTMLElement[];
     cost: number;
 }
 
 export interface IBasketData {
-    basket: IBasket;
-    basketList: ICard[];
-    toRemove: string;
-    addProduct(card: ICard): void;
-    removeProduct(id: string): void;
+    add(card: ICard): void;
+    remove(card: ICard): void;
+    clear(): void;
 }
 
 export interface IContacts {

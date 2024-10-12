@@ -21,7 +21,7 @@ export class CardsData implements ICardsData {
 
     set selectedCard(id: string) {
         this._selectedCard = id;
-        // this.events.emit('selected-card:changed');
+        this.events.emit('selected-card:changed');
     }
 
     get selectedCard() {
