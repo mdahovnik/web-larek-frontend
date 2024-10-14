@@ -7,7 +7,7 @@ export function isSelector(x: any): x is string {
 }
 
 export function isEmpty(value: any): boolean {
-    return value === null || value === undefined;
+    return value === null || value === undefined || value === '';
 }
 
 export type SelectorCollection<T> = string | NodeListOf<Element> | T[];

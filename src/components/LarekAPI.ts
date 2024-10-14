@@ -1,4 +1,4 @@
-import { IApi, ICard, IOrder, IOrderResult, TInitCards } from "../types";
+import { IApi, ICard, TOrderResult, TInitCards } from "../types";
 import { Api, ApiPostMethods } from "./base/api";
 
 
