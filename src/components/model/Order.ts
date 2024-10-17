@@ -9,7 +9,7 @@ export class Order implements IOrderData {
     private _email: string;
     private _phone: string;
     private _address: string;
-    private _cost: number;
+    private _total: number;
     private _items: TOrderProducts;
     protected _status: TOrderResult;
 
@@ -19,59 +19,44 @@ export class Order implements IOrderData {
 
     }
 
-    // public get payment(): string {
-    //     return this._payment;
-    // }
 
-    public set payment(value: TPayment) {
+    set payment(value: TPayment) {
         this._payment = value;
-        this.orderDataChanged();
+        this.eventsEmit('order-data:change');
         // this.events.emit('order-data-payment:changed', {data: this});
     }
 
-    // public get address(): string {
-    //     return this._address;
-    // }
-
-    public set address(value: string) {
+    set address(value: string) {
         this._address = value;
-        this.orderDataChanged();
+        this.eventsEmit('order-data:change');
     }
 
-    public get cost(): number {
-        return this._cost;
+    get total(): number {
+        return this._total;
     }
 
-    public set cost(value: number) {
-        this._cost = value;
-        this.orderDataChanged();
+    set total(value: number) {
+        this._total = value;
+        // this.eventsEmit();
     }
 
-    public get orderProducts(): TOrderProducts {
+    get items(): TOrderProducts {
         return this._items;
     }
 
-    public set orderProducts(value: TOrderProducts) {
+    set items(value: TOrderProducts) {
         this._items = value;
-        this.orderDataChanged();
+        // this.eventsEmit();
     }
 
-    // public get email(): string {
-    //     return this._email;
-    // }
-
-    public set email(value: string) {
+    set email(value: string) {
         this._email = value;
-        this.orderDataChanged();
+        this.eventsEmit('contacts-data:change');
     }
 
-    // public get phone(): string {
-    //     return this._phone;
-    // }
-
-    public set phone(value: string) {
+    set phone(value: string) {
         this._phone = value;
-        this.orderDataChanged();
+        this.eventsEmit('contacts-data:change');
     }
 
     set status(response: TOrderResult) {
@@ -95,23 +80,20 @@ export class Order implements IOrderData {
     }
 
 
-
     // getFullOrderData(obj: Record<keyof TOrderValidation, string>): TOrderValidation {
-    getFullOrderData(): TOrderValidation {
-        // if (Object.values(obj).some(item => item === '')) {
-        //     // return false;
-        // }
-        // const fullData= {};
+    getOrder(): TOrderValidation {
         return {
             'payment': this._payment,
             "email": this._email,
             "phone": this._phone,
-            "address": this._address
+            "address": this._address,
+            "total" : this._total,
+            'items': this._items
         }
     }
 
-    protected orderDataChanged() {
-        this.events.emit('order-data:change', { data: this })
+    protected eventsEmit(eventName: string) {
+        this.events.emit(eventName, { data: this })
     }
 
     // sendOrder(order: IOrder): void {

@@ -6,7 +6,6 @@ export class Basket implements IBasketData {
     protected _list: ICard[];
     protected _cost: number;
     protected _total: number;
-    // toRemove: string;
 
     constructor(protected events: IEvents) {
         this._list = [];
@@ -24,7 +23,6 @@ export class Basket implements IBasketData {
 
     get cost(): number {
         if (!this._list.length) return 0;
-
         return this._list.map((item) => item.price).reduce((a, b) => a + b);
     }
 
@@ -52,7 +50,7 @@ export class Basket implements IBasketData {
         this.basketDataChanged();
     }
 
-    getBasketProductsIds() {
+    getBasketProductsId() {
         return this._list.map(card => card.id) ;
     }
 
@@ -64,12 +62,12 @@ export class Basket implements IBasketData {
         return this._list.length === 0;
     }
     //TODO: определить возвращаемый тип
-    getFullBasketData() {
-        return {
-            "total": this.cost,
-            "items": this.getBasketProductsIds()
-        }
-    }
+    // getFullBasketData() {
+    //     return {
+    //         "total": this.cost,
+    //         "items": this.getBasketProductsIds()
+    //     }
+    // }
 
     protected basketDataChanged() {
         this.events.emit('basket-data:change', { data: this })

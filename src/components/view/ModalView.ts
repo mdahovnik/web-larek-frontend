@@ -22,17 +22,25 @@ export class ModalView extends View<IModalContent> {
             evt.stopPropagation();
         });
 
-        // this.events.on('modal:close', this.close.bind(this));
+        this.handleEscUp = this.handleEscUp.bind(this);
     }
 
     open() {
         this.container.classList.add('modal_active');
         this.container.classList.add('page__wrapper_locked');
+        document.addEventListener('keyup', this.handleEscUp);
     }
 
     close() {
         this.container.classList.remove('modal_active');
         this.container.classList.remove('page__wrapper_locked');
+
+        document.removeEventListener('keyup', this.handleEscUp);
+    }
+
+    protected handleEscUp(event: KeyboardEvent) {
+        if (event.key === 'Escape')
+            this.close();
     }
 
     set content(content: HTMLElement) {

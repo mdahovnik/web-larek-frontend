@@ -41,8 +41,8 @@ export interface IContacts {
 export interface IOrderData extends IContacts {
     payment: string;
     address: string;
-    cost: number;
-    orderProducts: TOrderProducts;
+    total: number;
+    items: TOrderProducts;
     status: TOrderResult;
     // isOrderValid: boolean;
     isOrderValid(data: Record<keyof TOrderValidation, string | number>): boolean;
@@ -64,7 +64,7 @@ export type TPayment = 'card' | 'cash';
 export type TCardCatalog = Pick<ICard, 'image' | 'title' | 'category' | 'price'>;
 export type TCardModal = Pick<ICard, 'description' | 'image' | 'title' | 'category' | 'price'>;
 export type TCardBasket = Pick<ICard, 'title' | 'price' | 'id'>;
-export type TOrderValidation = Pick<IOrderData, 'payment' | 'address' | 'email' | 'phone'>;
+export type TOrderValidation = Pick<IOrderData, 'payment' | 'address' | 'email' | 'phone' | 'total' | 'items'>;
 export type TOrderResult = { id: string, total: number }
 export type TOrderContacts = Pick<IOrderData, 'email' | 'phone'>;//
 // export type TBasketData = Pick<IBasketData, 'cards' | 'cost'>;
