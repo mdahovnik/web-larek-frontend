@@ -3,14 +3,14 @@ import { isEmpty } from "../../utils/utils";
 import { IEvents } from "../base/events";
 
 
-export class OrderData implements IOrderData {
+export class Order implements IOrderData {
 
     private _payment: TPayment;
     private _email: string;
     private _phone: string;
     private _address: string;
-    private _total: number;
-    private _items: TOrderProducts[];
+    private _cost: number;
+    private _items: TOrderProducts;
     protected _status: TOrderResult;
 
     // isOrderValid: boolean;
@@ -38,24 +38,24 @@ export class OrderData implements IOrderData {
         this.orderDataChanged();
     }
 
-    public get total(): number {
-        return this._total;
+    public get cost(): number {
+        return this._cost;
     }
 
-    public set total(value: number) {
-        this._total = value;
+    public set cost(value: number) {
+        this._cost = value;
         this.orderDataChanged();
     }
 
-    public get orderProducts(): TOrderProducts[] {
+    public get orderProducts(): TOrderProducts {
         return this._items;
     }
 
-    public set orderProducts(value: TOrderProducts[]) {
+    public set orderProducts(value: TOrderProducts) {
         this._items = value;
         this.orderDataChanged();
     }
-    
+
     // public get email(): string {
     //     return this._email;
     // }
@@ -73,16 +73,16 @@ export class OrderData implements IOrderData {
         this._phone = value;
         this.orderDataChanged();
     }
-    
+
     set status(response: TOrderResult) {
         this._status = response;
     }
 
-    isOrderValid(): boolean{
+    isOrderValid(): boolean {
         return !isEmpty(this._payment) && !isEmpty(this._address);
     }
 
-    isContactsValid():boolean{
+    isContactsValid(): boolean {
         return !isEmpty(this._email) && !isEmpty(this._phone);
     }
 
@@ -94,9 +94,21 @@ export class OrderData implements IOrderData {
         // this._order = null;
     }
 
-    // isOrderValid(obj: Record<keyof TOrderValidation, string>): boolean {
-    //     return Object.values(obj).some(item => item === '');
-    // }
+
+
+    // getFullOrderData(obj: Record<keyof TOrderValidation, string>): TOrderValidation {
+    getFullOrderData(): TOrderValidation {
+        // if (Object.values(obj).some(item => item === '')) {
+        //     // return false;
+        // }
+        // const fullData= {};
+        return {
+            'payment': this._payment,
+            "email": this._email,
+            "phone": this._phone,
+            "address": this._address
+        }
+    }
 
     protected orderDataChanged() {
         this.events.emit('order-data:change', { data: this })

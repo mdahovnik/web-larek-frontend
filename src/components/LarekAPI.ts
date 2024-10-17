@@ -18,5 +18,8 @@ export class LarekAPI {
         return this._baseApi.get<T>('/product/').then((obj: T) => obj);
     }
 
-    // getOrderResult<T>(): (order: IOrder) => Promise<T>;
+    setOrder<T>(data: object): Promise<T> {
+        return this._baseApi.post<T>('/order', data,'POST').then((obj: T) => obj);
+    }
+
 }

@@ -8,10 +8,10 @@ export interface IOrderForm {
     error: string;
 }
 
-export class OrderFormView extends View<IOrderForm> {
+export class FormOrderView extends View<IOrderForm> {
 
     protected _orderButtons?: NodeListOf<HTMLButtonElement>;
-    protected _inputFields: NodeListOf<HTMLInputElement>;
+    protected _inputs: NodeListOf<HTMLInputElement>;
     protected _submitButton: HTMLButtonElement;
     protected _error: HTMLElement;
     protected _isValid: boolean;
@@ -22,38 +22,39 @@ export class OrderFormView extends View<IOrderForm> {
 
         this.containerName = this.container.getAttribute('name');
         this._orderButtons = this.container.querySelectorAll('button[type=button]');
-        this._inputFields = this.container.querySelectorAll<HTMLInputElement>('.form__input');
+        this._inputs = this.container.querySelectorAll<HTMLInputElement>('.form__input');
         this._submitButton = this.container.querySelector('button[type=submit]');
         this._error = this.container.querySelector('.form__errors');
 
         this._orderButtons?.forEach(button => {
             button.addEventListener('click', () => {
                 this.togglePaymentButton(button.name);
-                events.emit(`${this.containerName}:payment`, { data: button.name });
+                this.emitChanges(`${this.containerName}:payment`, { data: button.name });
             })
         })
 
         this.container.addEventListener('input', (event) => {
-            const inputValue = (event.target as HTMLInputElement).value;
-            this.events.emit(`${this.containerName}:input`, { data: inputValue })
+            const input = (event.target as HTMLInputElement);
+            this.emitChanges(`${this.containerName}-${input.name}:input`, { data: input.value })
         });
 
         this.container.addEventListener('submit', (evt) => {
             evt.preventDefault();
             this.reset();
-            this.events.emit(`${this.containerName}:submit`);
+            this.emitChanges(`${this.containerName}:submit`);
         });
 
     }
 
     set valid(value: boolean) {
         this._isValid = value;
-        this.toggleDisabledAttribute(this._submitButton, this._isValid);
+        // this.toggleDisabledAttribute(this._submitButton, this._isValid);
+        this._submitButton.toggleAttribute('disabled', !value);
     }
 
-    set error(validationString: string) {
-        if (validationString)
-            this.showInputError(validationString);
+    set error(error: string) {
+        if (error)
+            this.showInputError(error);
         else
             this.hideInputError();
     }

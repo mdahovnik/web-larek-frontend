@@ -10,8 +10,8 @@ export class ModalView extends View<IModalContent> {
     protected _closeBtn: HTMLButtonElement;
     protected _content: HTMLElement;
 
-    constructor(protected container: HTMLElement, protected _events: IEvents) {
-        super(container, _events);
+    constructor(protected container: HTMLElement, protected events: IEvents) {
+        super(container, events);
 
         this._closeBtn = container.querySelector('.modal__close');
         this._content = container.querySelector('.modal__content');
@@ -37,7 +37,6 @@ export class ModalView extends View<IModalContent> {
 
     set content(content: HTMLElement) {
         // console.log(this._content);
-
         this._content.replaceChildren(content);
     }
 

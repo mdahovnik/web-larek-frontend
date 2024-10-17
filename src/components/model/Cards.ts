@@ -2,19 +2,19 @@ import { ICard, ICardsData } from "../../types";
 import { IEvents } from "../base/events";
 
 export class Cards implements ICardsData {
-    protected _cardsList: ICard[];
+    protected _list: ICard[];
     protected _selectedCard: string;
 
     constructor(protected events: IEvents) {
     }
 
-    set cardsList(cards: ICard[]) {
-        this._cardsList = cards;
-        this.events.emit('cardsList:change');
+    set list(cards: ICard[]) {
+        this._list = cards;
+        this.events.emit('cards-list:update');
     }
 
-    get cardsList() {
-        return this._cardsList;
+    get list() {
+        return this._list;
     }
 
     set selectedCard(id: string) {
@@ -27,10 +27,10 @@ export class Cards implements ICardsData {
     }
 
     getCard(id: string): ICard {
-        return this._cardsList.find(card => card.id === id);
+        return this._list.find(card => card.id === id);
     }
 
-    setCardStatus(id: string, value: boolean){
+    setCardBasketStatus(id: string, value: boolean){
         this.getCard(id).isInBasket = value;
     }
 

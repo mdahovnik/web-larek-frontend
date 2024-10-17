@@ -1,23 +1,23 @@
-import { ICard } from "../../types";
+import { ICard, TCardCatalog } from "../../types";
 import { CDN_URL } from "../../utils/constants";
 import { IEvents } from "../base/events";
 import { View } from "../common/View";
 
 
 export class CardView extends View<ICard> {
-    protected _events: IEvents;
-    protected _cardCategory?: HTMLSpanElement;
+    // protected _events: IEvents;
+    protected _cardCategory: HTMLSpanElement;
     protected _cardTitle: HTMLTitleElement;
-    protected _cardImage?: HTMLImageElement;
+    protected _cardImage: HTMLImageElement;
     protected _cardPrice: HTMLSpanElement;
-    protected _cardText?: HTMLParagraphElement;
+    protected _cardText: HTMLParagraphElement;
     protected _button: HTMLButtonElement;
     private _isInBasket: boolean;
 
     constructor(protected container: HTMLElement, events: IEvents) {
         super(container, events);
 
-        this._events = events;
+        // this._events = events;
         this._cardCategory = this.container.querySelector('.card__category');
         this._cardTitle = this.container.querySelector('.card__title');
         this._cardImage = this.container.querySelector('.card__image');
@@ -26,27 +26,26 @@ export class CardView extends View<ICard> {
         this._button = this.container.querySelector('.card__button');
 
         if (this._cardText) {
-            this.setEmitOnElementClick('card-basket:add', this._button);
-            // this._button.addEventListener('click', () => {
-            //     this.events.emit('card-basket:add', { card: this });
-            // });
+            this._button.addEventListener('click', () => {
+
+                if (this._isInBasket && this._cardCategory) {
+                    this.emitChanges('basket:remove', { data: this });
+                } else
+                    this.emitChanges('basket:add', { data: this });
+            });
         }
 
         if (!this._button) {
-            this.setEmitOnElementClick('card-preview:change', this.container);
-            // this.container.addEventListener('click', () => {
-            //     this.events.emit('card-preview:change',{ card: this });
-            // });
+            this.container.addEventListener('click', () => {
+                this.emitChanges('card-preview:select', { data: this });
+            });
         }
 
         if (!this._cardCategory) {
-            this.setEmitOnElementClick('card-basket:remove', this._button);
-            // this._button.addEventListener('click', () => {
-            //     this.events.emit('card-basket:remove',{ card: this });
-            // });
+            this._button.addEventListener('click', () => {
+                this.emitChanges('basket:remove', { data: this });
+            });
         }
-
-
     }
 
     set category(category: string) {
@@ -55,7 +54,8 @@ export class CardView extends View<ICard> {
     }
 
     set title(title: string) {
-        this._cardTitle.textContent = title;
+        if (this._cardTitle)
+            this._cardTitle.textContent = title;
     }
 
     set image(address: string) {
@@ -64,13 +64,14 @@ export class CardView extends View<ICard> {
     }
 
     set price(price: number) {
-        this._cardPrice.textContent = price ? String(price) : "Бесценно";
-        this.toggleDisabledAttribute(this._button, price);
+        this._cardPrice.textContent = price ? String(price) + ' синапсов' : 'Бесценно';
+        this._button?.toggleAttribute('disabled', Number(price) === 0);
     }
 
     set description(text: string) {
-        if (this._cardText)
+        if (this._cardText) {
             this._cardText.textContent = text;
+        }
     }
 
     set isInBasket(value: boolean) {
@@ -78,16 +79,8 @@ export class CardView extends View<ICard> {
 
         if (this._isInBasket && this._cardCategory) {
             this._button.textContent = 'Удалить';
-            this.setEmitOnElementClick('card-basket:remove', this._button);
-            // this._button.addEventListener('click', () => {
-            //     this.events.emit('card-basket:add', { card: this })
-            // });
         }
     }
 
-    // set button(text: string) {
-    //     if (this.cardText)
-    //         this.cardText.textContent = text;
-    // }
 
 }

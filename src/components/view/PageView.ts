@@ -15,14 +15,15 @@ export class PageView extends View<IPage> {
 
     constructor(protected container: HTMLElement, protected _events: IEvents) {
         super(container, _events);
+
         this._basket = ensureElement('.header__basket');
         this._basketCount = container.querySelector('.header__basket-counter');
         this._gallery = container.querySelector('.gallery');
 
-        this.setEmitOnElementClick('basket: open', this._basket);
-        // this._basket.addEventListener('click', () => {
-        //     this.events.emit('basket: open', { data: this });
-        // });
+        // this.setEmitOnElementClick('basket:open', this._basket);
+        this._basket.addEventListener('click', () => {
+            this.emitChanges('basket:open', { data: this });
+        });
     }
 
     set gallery(elements: HTMLElement[]) {
@@ -33,8 +34,5 @@ export class PageView extends View<IPage> {
         this._basketCount.textContent = String(data);
     }
 
-    // render(data: Partial<IPage>) {
-    //     Object.assign(this, data);
-    //     return this.container;
-    // }
+    
 }

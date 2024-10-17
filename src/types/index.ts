@@ -1,17 +1,17 @@
 import { ApiPostMethods } from "../components/base/api";
 
 export interface ICard {
-    category: string;
-    description: string;
     id: string;
+    description: string;
     image: string;
-    price: number;
     title: string;
+    category: string;
+    price: number;
     isInBasket: boolean;
 }
 
 export interface ICardsData {
-    cardsList: ICard[];
+    list: ICard[];
     selectedCard: string | null;
     getCard(id: string): ICard;
 }
@@ -41,8 +41,8 @@ export interface IContacts {
 export interface IOrderData extends IContacts {
     payment: string;
     address: string;
-    total: number;
-    orderProducts: TOrderProducts[];
+    cost: number;
+    orderProducts: TOrderProducts;
     status: TOrderResult;
     // isOrderValid: boolean;
     isOrderValid(data: Record<keyof TOrderValidation, string | number>): boolean;
@@ -55,12 +55,13 @@ export interface IApi {
     post<T>(uri: string, data: object, method?: ApiPostMethods): Promise<T>;
 }
 
+//TODO: перепроверить типы
 export type TInitCards = { total: number, items: ICard[] };
-export type TOrderProducts = { items: string[] };
+export type TOrderProducts = string[];
 export type TFormOrder = Pick<IOrderData, 'payment' | 'address'>;//
 export type TPayment = 'card' | 'cash';
 
-export type TCardBase = Pick<ICard, 'image' | 'title' | 'category' | 'price'>;
+export type TCardCatalog = Pick<ICard, 'image' | 'title' | 'category' | 'price'>;
 export type TCardModal = Pick<ICard, 'description' | 'image' | 'title' | 'category' | 'price'>;
 export type TCardBasket = Pick<ICard, 'title' | 'price' | 'id'>;
 export type TOrderValidation = Pick<IOrderData, 'payment' | 'address' | 'email' | 'phone'>;

@@ -32,10 +32,6 @@ export class Basket implements IBasketData {
         return this._list.length ?? 0;
     }
 
-    getBasketProductsIds(): TOrderProducts {
-        return { items: this._list.map(card => card.id) };
-    }
-
     add(card: ICard): void {
         if (!this.contains(card)) {
             this._list.unshift(card);
@@ -56,12 +52,27 @@ export class Basket implements IBasketData {
         this.basketDataChanged();
     }
 
-    protected basketDataChanged() {
-        this.events.emit('basket-data:change', { data: this })
+    getBasketProductsIds() {
+        return this._list.map(card => card.id) ;
     }
 
     contains(card: ICard) {
         return this._list.some(item => item.id === card.id);
+    }
+
+    isEmpty(): boolean {
+        return this._list.length === 0;
+    }
+    //TODO: определить возвращаемый тип
+    getFullBasketData() {
+        return {
+            "total": this.cost,
+            "items": this.getBasketProductsIds()
+        }
+    }
+
+    protected basketDataChanged() {
+        this.events.emit('basket-data:change', { data: this })
     }
 
 
