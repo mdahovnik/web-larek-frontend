@@ -50,21 +50,19 @@ export interface IOrderData extends IContacts {
 }
 
 
-export interface IApi {
-    get<T>(url: string): Promise<T>;
-    post<T>(uri: string, data: object, method?: ApiPostMethods): Promise<T>;
-}
 
 //TODO: перепроверить типы
 export type TInitCards = { total: number, items: ICard[] };
 export type TOrderProducts = string[];
 export type TFormOrder = Pick<IOrderData, 'payment' | 'address'>;//
 export type TPayment = 'card' | 'cash';
+export type TOrderValidation = Pick<IOrderData, 'payment' | 'address' | 'email' | 'phone' | 'total' | 'items'>;
+export type TOrderResult = { id: string, total: number }
+
+
 
 export type TCardCatalog = Pick<ICard, 'image' | 'title' | 'category' | 'price'>;
 export type TCardModal = Pick<ICard, 'description' | 'image' | 'title' | 'category' | 'price'>;
 export type TCardBasket = Pick<ICard, 'title' | 'price' | 'id'>;
-export type TOrderValidation = Pick<IOrderData, 'payment' | 'address' | 'email' | 'phone' | 'total' | 'items'>;
-export type TOrderResult = { id: string, total: number }
 export type TOrderContacts = Pick<IOrderData, 'email' | 'phone'>;//
 // export type TBasketData = Pick<IBasketData, 'cards' | 'cost'>;

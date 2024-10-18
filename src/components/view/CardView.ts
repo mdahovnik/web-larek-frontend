@@ -60,7 +60,7 @@ export class CardView extends View<ICard> {
 
     set image(address: string) {
         if (this._cardImage)
-            this._cardImage.src = CDN_URL + address;
+            this._cardImage.src = address;
     }
 
     set price(price: number) {

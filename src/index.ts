@@ -3,7 +3,7 @@ import { Api } from "./components/base/api";
 import { API_URL, CDN_URL, settings } from "./utils/constants";
 import { EventEmitter } from './components/base/events';
 import { Cards } from './components/model/Cards';
-import { LarekAPI } from './components/LarekAPI';
+import { LarekAPI } from './components/base/LarekAPI';
 import { CardView } from './components/view/CardView';
 import { IBasketData, ICard, TCardBasket, TCardCatalog, TFormOrder, TInitCards, TOrderResult, TPayment } from './types';
 import { PageView } from './components/view/PageView';
@@ -17,8 +17,7 @@ import { OrderSuccessView } from './components/view/OrderSuccessView';
 
 
 const events = new EventEmitter();
-const baseApi = new Api(API_URL);
-const api = new LarekAPI(baseApi);
+const api = new LarekAPI(CDN_URL, API_URL);
 
 const basketTemplate = cloneTemplate('#basket');
 const contactsTemplate = cloneTemplate('#contacts');
@@ -41,8 +40,8 @@ events.onAll((event) => {
 });
 
 // инициализация
-api.getProductList<TInitCards>().then(initObject => {
-    cards.list = initObject.items;
+api.getProductList().then(initObject => {
+    cards.list = initObject;
 
     const galleryItems = cards.list.map(cardData => {
         const newCardView = new CardView(cloneTemplate('#card-catalog'), events);
@@ -59,7 +58,7 @@ api.getProductList<TInitCards>().then(initObject => {
 events.on('card-preview:select', (event: { data: ICard }) => {
     const isInBasket = basket.contains(event.data);
     cards.setCardBasketStatus(event.data.id, isInBasket);
-    
+
     const newCardView = new CardView(cloneTemplate('#card-preview'), events);
     const newCardElement = newCardView.render(cards.getCard(event.data.id));
     modalView.render({ content: newCardElement });
@@ -139,7 +138,7 @@ events.on('contacts-data:change', () => {
 })
 
 events.on('contacts-form:submit', () => {
-    api.placeOrder<TOrderResult>(order.getOrder()).then(data => {
+    api.placeOrder(order.getOrder()).then(data => {
         orderSuccessView.render({ description: `Списано ${data.total} синапсов` })
         modalView.render({ content: successTemplate })
         orderView.reset();
