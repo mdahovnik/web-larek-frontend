@@ -6,11 +6,11 @@ export abstract class View<T> {
     }
 
     // TODO: унифицировать
-    setEmitOnElementClick<T>(event: string, element: HTMLElement) {
-        element.addEventListener('click', () => {
-            this.events.emit(event, { data: this });
-        });
-    }
+    // setEmitOnElementClick<T>(event: string, element: HTMLElement) {
+    //     element.addEventListener('click', () => {
+    //         this.events.emit(event, { data: this });
+    //     });
+    // }
 
     emitChanges(event: string, payload?: object) {
         // Состав данных можно модифицировать

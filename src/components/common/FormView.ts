@@ -1,9 +1,9 @@
+import { TOrderError } from "../../types";
 import { IEvents } from "../base/events";
 // import { IOrderForm } from "../view/FormOrderView";
 import { View } from "./View";
 
 export interface IOrderForm {
-    valid: boolean;
     error: string;
 }
 
@@ -21,30 +21,31 @@ export class FormView extends View<IOrderForm> {
 
         this.container.addEventListener('input', (event) => {
             const input = (event.target as HTMLInputElement);
-            this.emitChanges(`${this.containerName}-${input.name}:input`, { data: input.value })
+            const name = input.name;
+            const value = input.value;
+            this.emitChanges(`${this.containerName}-${name}:input`, { value })
         });
 
         this.container.addEventListener('submit', (evt) => {
             evt.preventDefault();
+            //TODO: сброс формы
             // this.reset();
             this.emitChanges(`${this.containerName}:submit`);
         });
 
     }
 
-    set valid(value: boolean) {
-        // this._isValid = value;
-        // this.toggleDisabledAttribute(this._submitButton, this._isValid);
-        this._submitButton.toggleAttribute('disabled', !value);
-    }
-
     set error(error: string) {
-        if (error) this.showInputError(error);
-        else this.hideInputError();
+        if (error)
+            this.showInputError(error);
+        else
+            this.hideInputError();
+
+        this._submitButton.toggleAttribute('disabled', !(error.length === 0));
     }
 
     private showInputError(errorMessage: string) {
-        this._error.textContent = errorMessage;
+        this._error.textContent = 'Укажите ' + errorMessage;
     }
 
     private hideInputError() {
@@ -55,6 +56,6 @@ export class FormView extends View<IOrderForm> {
     reset() {
         (this.container as HTMLFormElement).reset();
         // this._orderButtons.forEach(button => button.classList.remove('button_alt-active'))
-        this.valid = false;
+        // this.valid = false;
     }
 }

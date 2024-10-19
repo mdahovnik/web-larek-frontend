@@ -37,7 +37,7 @@ export class CardView extends View<ICard> {
 
         if (!this._button) {
             this.container.addEventListener('click', () => {
-                this.emitChanges('card-preview:select', { data: this });
+                this.emitChanges('card-preview:changed', { data: this });
             });
         }
 

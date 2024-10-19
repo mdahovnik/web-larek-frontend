@@ -1,103 +1,126 @@
-import { IOrderData, TOrderResult, TOrderProducts, TOrderValidation, TPayment } from "../../types";
+import { IOrderData, TOrderResult, TPayment, IOrder, TOrderError } from "../../types";
 import { isEmpty } from "../../utils/utils";
 import { IEvents } from "../base/events";
 
 
 export class Order implements IOrderData {
 
-    private _payment: TPayment;
-    private _email: string;
-    private _phone: string;
-    private _address: string;
-    private _total: number;
-    private _items: TOrderProducts;
-    protected _status: TOrderResult;
+    protected _status: string;
+    protected _orderErrors: TOrderError;
 
-    // isOrderValid: boolean;
+    protected _order: IOrder = {
+        payment: '',
+        email: '',
+        phone: '',
+        address: '',
+        total: 0,
+        items: []
+    }
 
     constructor(protected events: IEvents) {
-
     }
 
 
-    set payment(value: TPayment) {
-        this._payment = value;
-        this.eventsEmit('order-data:change');
-        // this.events.emit('order-data-payment:changed', {data: this});
-    }
+    // setOrder(key: keyof IOrder, value: any) {
+    //     this._order[key] = value;
+    // }
 
-    set address(value: string) {
-        this._address = value;
+    setPayment(value: TPayment) {
+        this._order.payment = value;
+        this.validateOrder();
         this.eventsEmit('order-data:change');
     }
 
-    get total(): number {
-        return this._total;
+    setAddress(value: string) {
+        this._order.address = value;
+        this.validateOrder();
+        this.eventsEmit('order-data:change');
     }
 
-    set total(value: number) {
-        this._total = value;
-        // this.eventsEmit();
+    setTotal(value: number) {
+        this._order.total = value;
+        this.validateOrder();
+        this.eventsEmit('order-data:change');
+
     }
 
-    get items(): TOrderProducts {
-        return this._items;
+    setItems(value: string[]) {
+        this._order.items = value;
+        // this.validateOrder();
+        // this.eventsEmit('order-data:change');
     }
 
-    set items(value: TOrderProducts) {
-        this._items = value;
-        // this.eventsEmit();
-    }
-
-    set email(value: string) {
-        this._email = value;
+    setEmail(value: string) {
+        this._order.email = value;
+        this.validateOrder();
         this.eventsEmit('contacts-data:change');
     }
 
-    set phone(value: string) {
-        this._phone = value;
+    setPhone(value: string) {
+        this._order.phone = value;
+        this.validateOrder();
         this.eventsEmit('contacts-data:change');
     }
 
-    set status(response: TOrderResult) {
-        this._status = response;
+    set status(value: string) {
+        this._status = value;
     }
 
     isOrderValid(): boolean {
-        return !isEmpty(this._payment) && !isEmpty(this._address);
+        return !isEmpty(this._order.payment) && !isEmpty(this._order.address);
     }
 
     isContactsValid(): boolean {
-        return !isEmpty(this._email) && !isEmpty(this._phone);
+        return !isEmpty(this._order.email) && !isEmpty(this._order.phone);
     }
 
     getOrderStatus(): boolean {
-        return this._status.id !== null;
+        return this._status !== null;
     }
 
     clear() {
         // this._order = null;
     }
 
-
     // getFullOrderData(obj: Record<keyof TOrderValidation, string>): TOrderValidation {
-    getOrder(): TOrderValidation {
-        return {
-            'payment': this._payment,
-            "email": this._email,
-            "phone": this._phone,
-            "address": this._address,
-            "total" : this._total,
-            'items': this._items
-        }
+    get order() {
+        return this._order;
     }
 
     protected eventsEmit(eventName: string) {
-        this.events.emit(eventName, { data: this })
+        this.events.emit(eventName, this._orderErrors)
     }
 
-    // sendOrder(order: IOrder): void {
-    //     throw new Error("Method not implemented.");
+    getOrderError() {
+        return this._orderErrors;
+    }
+
+    // getError(field: keyof TOrderError) {
+    //     return this._orderErrors[field];
     // }
 
+    isValid() {
+        return Object.keys(this._orderErrors).length === 0;
+    }
+
+    validateOrder() {
+        const errors: typeof this._orderErrors = {};
+
+        if (!this._order.payment) {
+            errors.payment = 'способ оплаты';
+        }
+        if (!this._order.address) {
+            errors.address = 'адрес';
+        }
+        if (!this._order.email) {
+            errors.email = 'email';
+        }
+        if (!this._order.phone) {
+            errors.phone = 'телефон';
+        }
+
+        this._orderErrors = errors;
+        // this.events.emit('order-errors:change', this._orderErrors);
+
+    }
 }

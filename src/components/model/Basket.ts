@@ -1,66 +1,63 @@
-import { IBasketData, ICard, TOrderProducts } from "../../types";
+import { IBasketData, ICard } from "../../types";
 import { IEvents } from "../base/events";
 
 export class Basket implements IBasketData {
 
-    protected _list: ICard[];
-    protected _cost: number;
-    protected _total: number;
+    protected _cards: ICard[];
 
     constructor(protected events: IEvents) {
-        this._list = [];
-        this._cost = 0;
+        this._cards = [];
     }
 
     set cards(cards: ICard[]) {
-        this._list = cards;
+        this._cards = cards;
         this.basketDataChanged();
     }
 
     get cards(): ICard[] {
-        return this._list;
+        return this._cards;
     }
 
-    get cost(): number {
-        if (!this._list.length) return 0;
-        return this._list.map((item) => item.price).reduce((a, b) => a + b);
+    getCost() {
+        if (!this._cards.length) return 0;
+        return this._cards.map((item) => item.price).reduce((a, b) => a + b);
     }
 
-    get total() {
-        return this._list.length ?? 0;
+    getCount() {
+        return this._cards.length ?? 0;
     }
 
     add(card: ICard): void {
         if (!this.contains(card)) {
-            this._list.unshift(card);
+            this._cards.unshift(card);
             this.basketDataChanged();
         }
     }
 
     remove(card: ICard): void {
         if (this.contains(card)) {
-            this._list = this._list.filter(item => item.id !== card.id);
+            this._cards = this._cards.filter(item => item.id !== card.id);
             this.basketDataChanged();
         }
     }
 
     clear() {
-        this._list = [];
-        this._cost = 0;
+        this._cards = [];
         this.basketDataChanged();
     }
 
-    getBasketProductsId() {
-        return this._list.map(card => card.id) ;
+    getProductIdList() {
+        return this._cards.map(card => card.id) ;
     }
 
     contains(card: ICard) {
-        return this._list.some(item => item.id === card.id);
+        return this._cards.some(item => item.id === card.id);
     }
 
     isEmpty(): boolean {
-        return this._list.length === 0;
+        return this._cards.length === 0;
     }
+
     //TODO: определить возвращаемый тип
     // getFullBasketData() {
     //     return {

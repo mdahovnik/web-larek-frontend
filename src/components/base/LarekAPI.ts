@@ -1,11 +1,11 @@
 // import { IApi, ICard, TOrderResult, TInitCards } from "../../types";
-import { ICard, TInitCards, TOrderResult, TOrderValidation } from "../../types";
+import { ICard, TInitCards, TOrderResult, IOrder } from "../../types";
 import { Api } from "./api";
 
 
 export interface ILarekAPI {
     getProductList: () => Promise<ICard[]>;
-    placeOrder: (order: TOrderValidation) => Promise<TOrderResult>;
+    placeOrder: (order: IOrder) => Promise<TOrderResult>;
 }
 
 export class LarekAPI extends Api implements ILarekAPI {
@@ -25,7 +25,7 @@ export class LarekAPI extends Api implements ILarekAPI {
         );
     }
 
-    placeOrder(order: TOrderValidation): Promise<TOrderResult> {
+    placeOrder(order: IOrder): Promise<TOrderResult> {
         return this.post('/order', order, 'POST').then((result: TOrderResult) => result);
     }
 

@@ -5,7 +5,7 @@ import { EventEmitter } from './components/base/events';
 import { Cards } from './components/model/Cards';
 import { LarekAPI } from './components/base/LarekAPI';
 import { CardView } from './components/view/CardView';
-import { IBasketData, ICard, TCardBasket, TCardCatalog, TFormOrder, TInitCards, TOrderResult, TPayment } from './types';
+import { IBasketData, ICard, IOrder, TCardBasket, TCardCatalog, TInitCards, TOrderError, TOrderResult, TPayment } from './types';
 import { PageView } from './components/view/PageView';
 import { cloneTemplate, ensureElement } from './utils/utils';
 import { ModalView } from './components/view/ModalView';
@@ -48,20 +48,25 @@ api.getProductList().then(initObject => {
         return newCardView.render(cardData);
     });
 
-    pageView.render({ gallery: galleryItems });
+    pageView.render({
+        gallery: galleryItems
+    });
 
 }).catch(err => console.error(err))
 
 
 
 //просмотр карточки
-events.on('card-preview:select', (event: { data: ICard }) => {
+events.on('card-preview:changed', (event: { data: ICard }) => {
     const isInBasket = basket.contains(event.data);
     cards.setCardBasketStatus(event.data.id, isInBasket);
 
     const newCardView = new CardView(cloneTemplate('#card-preview'), events);
     const newCardElement = newCardView.render(cards.getCard(event.data.id));
-    modalView.render({ content: newCardElement });
+
+    modalView.render({
+        content: newCardElement
+    });
 })
 
 
@@ -70,15 +75,22 @@ events.on('card-preview:select', (event: { data: ICard }) => {
 events.on('basket:add', (event: { data: ICard }) => {
     basket.add(cards.getCard(event.data.id));
     cards.setCardBasketStatus(event.data.id, basket.contains(event.data));
-    pageView.render({ count: basket.total });
+
+    pageView.render({
+        count: basket.getCount()
+    });
+
     modalView.close();
 })
+
 
 events.on('basket:remove', (event: { data: ICard }) => {
     basket.remove(event.data);
     cards.setCardBasketStatus(event.data.id, basket.contains(event.data));
+
     if (basket.isEmpty()) modalView.close();
 })
+
 
 events.on('basket-data:change', (event: { data: IBasketData }) => {
     const cardsList = event.data.cards.map((item) => {
@@ -86,64 +98,107 @@ events.on('basket-data:change', (event: { data: IBasketData }) => {
         return newCardView.render(cards.getCard(item.id));
     });
 
-    basketView.render({ cost: basket.cost, cards: cardsList });
-    pageView.render({ count: basket.total });
+    basketView.render({
+        cost: basket.getCost(),
+        cards: cardsList
+    });
+
+    pageView.render({
+        count: basket.getCount()
+    });
 })
+
 
 events.on('basket:open', () => {
-    basketView.render({ cost: basket.cost });
-    modalView.render({ content: basketTemplate });
+    basketView.render({
+        cost: basket.getCost()
+    });
+
+    modalView.render({
+        content: basketTemplate
+    });
 })
 
+
 events.on('basket:submit', () => {
-    order.items = basket.getBasketProductsId();
-    order.total = basket.cost;
-    modalView.render({ content: orderTemplate });
+    order.setItems(basket.getProductIdList());
+    order.setTotal(basket.getCost());
+    // order.validateOrder();
+    modalView.render({
+        content: orderTemplate
+    });
 })
 
 
 
 // ордер
-events.on('order-form:payment', (event: { data: TPayment }) => {
-    order.payment = event.data;
+events.on('order-form:payment', (event: { payment: TPayment }) => {
+    order.setPayment(event.payment);
 })
 
-events.on('order-form-address:input', (event: { data: string }) => {
-    order.address = event.data;
+
+events.on('order-form-address:input', (event: { value: string }) => {
+    order.setAddress(event.value);
 })
 
-events.on('order-data:change', () => {
-    const errorMessage = order.isOrderValid() ? '' : 'Укажите все данные';
-    orderView.render({ valid: order.isOrderValid(), error: errorMessage });
+
+events.on('order-data:change', (errors: Partial<IOrder>) => {
+    const { payment, address } = errors;
+
+    orderView.render({
+        error: getErrorMessage({ payment, address })
+    });
 })
 
-events.on('order-form:submit', (event: { payment: string, address: string }) => {
-    modalView.render({ content: contactsTemplate });
+events.on('order-form:submit', () => {
+    const { email, phone } = order.getOrderError();
+
+    contactsView.render({
+        error: getErrorMessage({ email, phone })
+    });
+
+    modalView.render({
+        content: contactsTemplate
+    });
 })
 
 
 
 // contacts
-events.on('contacts-form-email:input', (event: { data: string }) => {
-    order.email = event.data;
+events.on('contacts-form-email:input', (event: { value: string }) => {
+    order.setEmail(event.value);
 })
 
-events.on('contacts-form-phone:input', (event: { data: string }) => {
-    order.phone = event.data;
+
+events.on('contacts-form-phone:input', (event: { value: string }) => {
+    order.setPhone(event.value);
 })
 
-events.on('contacts-data:change', () => {
-    const contactsErrorMessage = order.isContactsValid() ? '' : 'Укажите все данные';
-    contactsView.render({ valid: order.isContactsValid(), error: contactsErrorMessage });
+
+events.on('contacts-data:change', (errors: Partial<IOrder>) => {
+    const { email, phone } = errors;
+
+    contactsView.render({
+        error: getErrorMessage({ email, phone })
+    });
+
 })
+
 
 events.on('contacts-form:submit', () => {
-    api.placeOrder(order.getOrder()).then(data => {
-        orderSuccessView.render({ description: `Списано ${data.total} синапсов` })
-        modalView.render({ content: successTemplate })
-        orderView.reset();
-        basket.clear();
-    }).catch(err => console.error(err))
+    api.placeOrder(order.order)
+        .then(data => {
+            orderSuccessView.render({
+                description: `Списано ${data.total} синапсов`
+            });
+
+            modalView.render({
+                content: successTemplate
+            });
+
+            orderView.reset();
+            basket.clear();
+        }).catch(err => console.error(err))
 })
 
 
@@ -153,9 +208,9 @@ events.on('order-success:submit', () => {
 })
 
 
-function getErrorMessage(): string {
-    return order.isOrderValid() ? '' : 'Укажите все данные';
+function getErrorMessage(errors: Partial<IOrder>): string {
+    return Object.values(errors)
+        .filter(i => !!i)
+        .join(' и ');
 }
-
-
 

@@ -10,7 +10,7 @@ export class Cards implements ICardsData {
 
     set list(cards: ICard[]) {
         this._list = cards;
-        this.events.emit('cards-list:update');
+        this.events.emit('cards:changed');
     }
 
     get list() {
@@ -19,7 +19,7 @@ export class Cards implements ICardsData {
 
     set selectedCard(id: string) {
         this._selectedCard = id;
-        this.events.emit('selected-card:change');
+        this.events.emit('selected-card:changed');
     }
 
     get selectedCard() {
