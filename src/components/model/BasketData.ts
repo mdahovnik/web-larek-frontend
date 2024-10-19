@@ -1,7 +1,7 @@
 import { IBasketData, ICard } from "../../types";
 import { IEvents } from "../base/events";
 
-export class Basket implements IBasketData {
+export class BasketData implements IBasketData {
 
     protected _cards: ICard[];
 

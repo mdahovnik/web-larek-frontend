@@ -23,12 +23,12 @@ export class BasketView extends View<IBasketContent> {
 
         // this.setEmitOnElementClick('basket:submit', this._basketButton);
         this._basketButton.addEventListener('click', () => {
-            this.emitChanges('basket:submit', {data: this})});
+            this.emitChanges('basket:submit', { data: this })
+        });
     }
 
     set cost(cost: number) {
         this._cost.textContent = cost ? `${cost} синапсов` : `0 синапсов`;
-        // this.toggleDisabledAttribute(this._basketButton, price,);
         this._basketButton?.toggleAttribute('disabled', cost === 0);
     }
 

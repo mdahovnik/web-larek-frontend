@@ -1,7 +1,7 @@
 import { ICard, ICardsData } from "../../types";
 import { IEvents } from "../base/events";
 
-export class Cards implements ICardsData {
+export class CardsData implements ICardsData {
     protected _list: ICard[];
     protected _selectedCard: string;
 

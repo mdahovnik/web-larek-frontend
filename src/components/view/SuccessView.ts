@@ -7,7 +7,7 @@ export interface IOrderSuccess {
     description: string;
 }
 
-export class OrderSuccessView extends View<IOrderSuccess> {
+export class SuccessView extends View<IOrderSuccess> {
 
     // protected _title: HTMLElement;
     protected _description: HTMLElement;

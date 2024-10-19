@@ -1,5 +1,6 @@
 import { ApiPostMethods } from "../components/base/api";
 
+//TODO: добавить не достающие методы
 export interface ICard {
     id: string;
     description: string;
@@ -36,22 +37,16 @@ export interface IContacts {
 export interface IOrder extends IContacts {
     payment: string;
     address: string;
-    total: number;
-    items: string[];
-    // orderProducts: TOrderProducts[];
 }
 
 export interface IOrderData {
-    // payment: string;
-    // address: string;
-    // total: number;
-    // items: string[];
     order: IOrder;
-    status: string;
-    // getOrder(): IOrder;
-    isOrderValid(data: Record<keyof IOrder, string | number>): boolean;
-    // isOrderValid: boolean;
-    // sendOrder(order: IOrder): void;
+    total: number;
+    items: string[];
+    status: boolean;
+    // getOrderStatus():void;
+    clearOrderData(): void;
+    clearContactsData(): void;
 }
 
 

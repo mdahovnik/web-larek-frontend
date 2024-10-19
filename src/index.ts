@@ -1,47 +1,47 @@
 import './scss/styles.scss';
-import { Api } from "./components/base/api";
 import { API_URL, CDN_URL, settings } from "./utils/constants";
 import { EventEmitter } from './components/base/events';
-import { Cards } from './components/model/Cards';
+import { CardsData } from './components/model/CardsData';
 import { LarekAPI } from './components/base/LarekAPI';
 import { CardView } from './components/view/CardView';
-import { IBasketData, ICard, IOrder, TCardBasket, TCardCatalog, TInitCards, TOrderError, TOrderResult, TPayment } from './types';
+import { IBasketData, ICard, IOrder, TPayment } from './types';
 import { PageView } from './components/view/PageView';
 import { cloneTemplate, ensureElement } from './utils/utils';
 import { ModalView } from './components/view/ModalView';
-import { Basket } from './components/model/Basket';
+import { BasketData } from './components/model/BasketData';
 import { BasketView } from './components/view/BasketView';
-import { Order } from './components/model/Order';
-import { OrderInfoView } from './components/view/OrderInfoView';
-import { OrderSuccessView } from './components/view/OrderSuccessView';
+import { OrderData } from './components/model/OrderData';
+import { OrderView } from './components/view/OrderView';
+import { SuccessView } from './components/view/SuccessView';
 
 
 const events = new EventEmitter();
 const api = new LarekAPI(CDN_URL, API_URL);
 
-const basketTemplate = cloneTemplate('#basket');
-const contactsTemplate = cloneTemplate('#contacts');
-const orderTemplate = cloneTemplate('#order');
-const successTemplate = cloneTemplate('#success');
+const basketTemplate = ensureElement<HTMLTemplateElement>('#basket');
+const contactsTemplate = ensureElement<HTMLTemplateElement>('#contacts');
+const orderTemplate = ensureElement<HTMLTemplateElement>('#order');
+const successTemplate = ensureElement<HTMLTemplateElement>('#success');
 
-const cards = new Cards(events);
-const basket = new Basket(events);
-const order = new Order(events);
+const cards = new CardsData(events);
+const basket = new BasketData(events);
+const order = new OrderData(events);
 
 const pageView = new PageView(ensureElement('.page__wrapper'), events);
 const modalView = new ModalView(ensureElement('#modal-container'), events);
-const basketView = new BasketView(basketTemplate, events);
-const orderView = new OrderInfoView(orderTemplate, events);
-const contactsView = new OrderInfoView(contactsTemplate, events);
-const orderSuccessView = new OrderSuccessView(successTemplate, events);
+
+const basketView = new BasketView(cloneTemplate(basketTemplate), events);
+const orderView = new OrderView(cloneTemplate(orderTemplate), events);
+const contactsView = new OrderView(cloneTemplate(contactsTemplate), events);
+const successView = new SuccessView(cloneTemplate(successTemplate), events);
 
 events.onAll((event) => {
     console.log(event.eventName, event.data);
 });
 
 // инициализация
-api.getProductList().then(initObject => {
-    cards.list = initObject;
+api.getProductList().then(data => {
+    cards.list = data;
 
     const galleryItems = cards.list.map(cardData => {
         const newCardView = new CardView(cloneTemplate('#card-catalog'), events);
@@ -55,20 +55,18 @@ api.getProductList().then(initObject => {
 }).catch(err => console.error(err))
 
 
-
 //просмотр карточки
 events.on('card-preview:changed', (event: { data: ICard }) => {
     const isInBasket = basket.contains(event.data);
     cards.setCardBasketStatus(event.data.id, isInBasket);
 
     const newCardView = new CardView(cloneTemplate('#card-preview'), events);
-    const newCardElement = newCardView.render(cards.getCard(event.data.id));
 
     modalView.render({
-        content: newCardElement
+        content: newCardView.render(
+            cards.getCard(event.data.id))
     });
 })
-
 
 
 //Корзина
@@ -83,7 +81,6 @@ events.on('basket:add', (event: { data: ICard }) => {
     modalView.close();
 })
 
-
 events.on('basket:remove', (event: { data: ICard }) => {
     basket.remove(event.data);
     cards.setCardBasketStatus(event.data.id, basket.contains(event.data));
@@ -91,11 +88,12 @@ events.on('basket:remove', (event: { data: ICard }) => {
     if (basket.isEmpty()) modalView.close();
 })
 
-
 events.on('basket-data:change', (event: { data: IBasketData }) => {
     const cardsList = event.data.cards.map((item) => {
         const newCardView = new CardView(cloneTemplate('#card-basket'), events);
-        return newCardView.render(cards.getCard(item.id));
+        return newCardView.render(
+            cards.getCard(item.id)
+        );
     });
 
     basketView.render({
@@ -108,39 +106,39 @@ events.on('basket-data:change', (event: { data: IBasketData }) => {
     });
 })
 
-
 events.on('basket:open', () => {
-    basketView.render({
-        cost: basket.getCost()
-    });
-
     modalView.render({
-        content: basketTemplate
+        content: basketView.render({
+            cost: basket.getCost()
+        })
     });
 })
-
 
 events.on('basket:submit', () => {
-    order.setItems(basket.getProductIdList());
-    order.setTotal(basket.getCost());
-    // order.validateOrder();
+    order.items = basket.getProductIdList();
+    order.total = basket.getCost();
+
+    order.clearOrderData();
+    const { payment, address } = order.getOrderError();
+
     modalView.render({
-        content: orderTemplate
+        content: orderView.render({
+            address: '',
+            payment: '',
+            error: getErrorMessage({ payment, address })
+        })
     });
 })
-
 
 
 // ордер
-events.on('order-form:payment', (event: { payment: TPayment }) => {
-    order.setPayment(event.payment);
+events.on('order-form-payment:select', (event: { payment: TPayment }) => {
+    order.setOrderField('payment', event.payment);
 })
-
 
 events.on('order-form-address:input', (event: { value: string }) => {
-    order.setAddress(event.value);
+    order.setOrderField('address', event.value);
 })
-
 
 events.on('order-data:change', (errors: Partial<IOrder>) => {
     const { payment, address } = errors;
@@ -151,29 +149,27 @@ events.on('order-data:change', (errors: Partial<IOrder>) => {
 })
 
 events.on('order-form:submit', () => {
+    order.clearContactsData();
     const { email, phone } = order.getOrderError();
-
-    contactsView.render({
-        error: getErrorMessage({ email, phone })
-    });
-
+    
     modalView.render({
-        content: contactsTemplate
+        content: contactsView.render({
+            email: '',
+            phone: '',
+            error: getErrorMessage({ email, phone })
+        })
     });
 })
-
 
 
 // contacts
 events.on('contacts-form-email:input', (event: { value: string }) => {
-    order.setEmail(event.value);
+    order.setOrderField('email', event.value)
 })
-
 
 events.on('contacts-form-phone:input', (event: { value: string }) => {
-    order.setPhone(event.value);
+    order.setOrderField('phone', event.value);
 })
-
 
 events.on('contacts-data:change', (errors: Partial<IOrder>) => {
     const { email, phone } = errors;
@@ -181,22 +177,18 @@ events.on('contacts-data:change', (errors: Partial<IOrder>) => {
     contactsView.render({
         error: getErrorMessage({ email, phone })
     });
-
 })
-
 
 events.on('contacts-form:submit', () => {
     api.placeOrder(order.order)
         .then(data => {
-            orderSuccessView.render({
-                description: `Списано ${data.total} синапсов`
-            });
-
             modalView.render({
-                content: successTemplate
+                content: successView.render({
+                    description: `Списано ${data.total} синапсов`
+                })
             });
 
-            orderView.reset();
+            order.status = true;
             basket.clear();
         }).catch(err => console.error(err))
 })
