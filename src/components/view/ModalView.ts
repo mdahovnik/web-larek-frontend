@@ -33,6 +33,7 @@ export class ModalView extends View<IModalContent> {
         this.container.classList.add('modal_active');
         this.container.classList.add('page__wrapper_locked');
         document.addEventListener('keyup', this.handleEscUp);
+        this.events.emit('modal:open');
     }
 
     close() {

@@ -1,4 +1,5 @@
 import { ICard } from "../../types";
+import { CategoryColor } from "../../utils/constants";
 import { IEvents } from "../base/events";
 import { View } from "../common/View";
 
@@ -33,7 +34,7 @@ export class CardView<T> extends View<T> {
         if (this._cardText) {
             this._button.addEventListener('click', () => {
                 if (this._isSelected)
-                    this.emitChanges('basket:remove', { id: { card: this } });
+                    this.emitChanges('basket:remove', { card: this });
                 else
                     this.emitChanges('basket:add', { card: this });
 
@@ -83,15 +84,6 @@ export class CardView<T> extends View<T> {
     }
 
     setColor(category: string) {
-
-        const CategoryColor = {
-            soft: "софт-скил",
-            hard: "хард-скил",
-            other: "другое",
-            additional: "дополнительное",
-            button: "кнопка"
-        }
-
         const color = (Object.keys(CategoryColor) as (keyof typeof CategoryColor)[])
             .find(key => {
                 return CategoryColor[key] === category

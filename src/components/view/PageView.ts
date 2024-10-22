@@ -6,17 +6,20 @@ import { IEvents } from "../base/events";
 interface IPage {
     gallery: HTMLElement[];
     count: number;
+    locked: boolean;
 }
 
 export class PageView extends View<IPage> {
     protected _basket: HTMLElement;
     protected _basketCount: HTMLElement;
     protected _gallery: HTMLElement;
+    protected _wrapper: HTMLElement;
 
     constructor(protected container: HTMLElement, protected _events: IEvents) {
         super(container, _events);
 
-        this._basket = ensureElement('.header__basket');
+        this._basket = container.querySelector('.header__basket');
+        this._wrapper = container.querySelector('.page__wrapper');
         this._basketCount = container.querySelector('.header__basket-counter');
         this._gallery = container.querySelector('.gallery');
 
@@ -33,5 +36,12 @@ export class PageView extends View<IPage> {
         this.setText(this._basketCount, value);
     }
 
-    
+    set locked(value: boolean) {
+        if (value) {
+            this._wrapper.classList.add('page__wrapper_locked');
+        } else {
+            this._wrapper.classList.remove('page__wrapper_locked');
+        }
+    }
+
 }

@@ -47,7 +47,8 @@ export class OrderData implements IOrderData {
     }
 
     isContactsValid() {
-        return this._order.email.length !== 0 && this._order.phone.length !== 0;
+        return this._order.email.length !== 0
+            && this._order.phone.length !== 0;
     }
 
     protected validateOrder() {

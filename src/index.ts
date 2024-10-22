@@ -28,7 +28,7 @@ const cards = new CardsData(events);
 const basket = new BasketData(events);
 const order = new OrderData(events);
 
-const pageView = new PageView(ensureElement('.page__wrapper'), events);
+const pageView = new PageView(ensureElement('.page'), events);
 const modalView = new ModalView(ensureElement<HTMLElement>('#modal-container'), events);
 
 const basketView = new BasketView(cloneTemplate(basketTemplate), events);
@@ -81,14 +81,12 @@ events.on('card-preview-button:press', (event: { data: ICard }) => {
 /**
  * BASKET
  */
-events.on('basket:add', (event: { card: ICard }) => {
+events.on('basket:add', (event: { card: ICard }) => {//TODO: получить id из презентера
     basket.add(cards.getCard(event.card.id));
 })
 
 events.on('basket:remove', (event: { card: ICard }) => {
-    console.log(event.card);
-
-    // basket.remove(event.card);
+    basket.remove(event.card);
 })
 
 events.on('basket-data:change', () => {
@@ -184,8 +182,12 @@ events.on('contacts-data:change', (errors: Partial<IOrder>) => {
 
 
 events.on('contacts-form:submit', () => {
-    const orderData = Object.assign(order.order, { total: basket.getCost(), items: basket.getIdList() });
-    // console.log(Object.assign(order.order, { total: basket.getCost(), items: basket.getIdList() }));
+    const orderData = Object.assign(
+        order.order,
+        {
+            total: basket.getCost(),
+            items: basket.getIdList()
+        });
 
     api.placeOrder(orderData)
         .then(data => {
@@ -207,6 +209,14 @@ events.on('order-success:submit', () => {
     modalView.close();
 })
 
+events.on('modal:open', () => {
+    pageView.locked = true;
+});
+
+
+events.on('modal:close', () => {
+    pageView.locked = false;
+});
 
 function getErrorMessage(errors: Partial<IOrder>): string {
     return Object.values(errors)
