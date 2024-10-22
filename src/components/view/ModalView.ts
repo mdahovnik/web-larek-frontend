@@ -26,7 +26,6 @@ export class ModalView extends View<IModalContent> {
     }
 
     set content(content: HTMLElement) {
-        // console.log(this._content);
         this._content.replaceChildren(content);
     }
 
@@ -39,8 +38,9 @@ export class ModalView extends View<IModalContent> {
     close() {
         this.container.classList.remove('modal_active');
         this.container.classList.remove('page__wrapper_locked');
-        this.content = null;
+        // this.content = null;
         document.removeEventListener('keyup', this.handleEscUp);
+        this.events.emit('modal:close');
     }
 
     protected handleEscUp(event: KeyboardEvent) {

@@ -4,31 +4,23 @@ import { IEvents } from "../base/events";
 //TODO: убрать не нужные методы
 export class OrderData implements IOrderData {
 
-    protected _status: boolean;
     protected _orderErrors: TOrderError;
-    protected _total: number;
-    protected _items: string[];
-
     protected _order: IOrder = {
         payment: '',
         email: '',
         phone: '',
-        address: '',
+        address: ''
     }
 
-    constructor(protected events: IEvents) { }
-
-    set total(value: number) {
-        this._total = value;
-        this.validateOrder();
+    constructor(protected events: IEvents) {
+        this._orderErrors = {};
     }
 
-    set items(value: string[]) {
-        this._items = value;
-        this.validateOrder();
+    get order() {
+        return this._order;
     }
 
-    setOrderField(field: keyof IOrder, value: string) {
+    setField(field: keyof IOrder, value: string) {
         this._order[field] = value;
         this.validateOrder();
 
@@ -38,24 +30,10 @@ export class OrderData implements IOrderData {
             this.eventsEmit('contacts-data:change');
     }
 
-    set status(value: boolean) {
-        this._status = value;
-        this.eventsEmit('order-status:change');
-    }
+    clearData() {
+        (Object.keys(this._order) as (keyof typeof this._order)[])
+            .forEach((key) => { this._order[key] = '' });
 
-    get status() {
-        return this._status !== null;
-    }
-
-    clearOrderData() {
-        this._order.payment = '';
-        this._order.address = '';
-        this.validateOrder();
-    }
-
-    clearContactsData() {
-        this._order.email = '';
-        this._order.phone = '';
         this.validateOrder();
     }
 
@@ -63,19 +41,21 @@ export class OrderData implements IOrderData {
         return this._orderErrors;
     }
 
-    get order() {
-        return Object.assign(this._order, { total: this._total, items: this._items });
+    isOrderValid() {
+        return this._order.payment.length !== 0
+            && this._order.address.length !== 0;
+    }
+
+    isContactsValid() {
+        return this._order.email.length !== 0 && this._order.phone.length !== 0;
     }
 
     protected validateOrder() {
         const errors: typeof this._orderErrors = {};
 
         if (!this._order.payment) errors.payment = 'способ оплаты';
-
         if (!this._order.address) errors.address = 'адрес';
-
         if (!this._order.email) errors.email = 'email';
-
         if (!this._order.phone) errors.phone = 'телефон';
 
         this._orderErrors = errors;

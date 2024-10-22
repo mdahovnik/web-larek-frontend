@@ -1,4 +1,4 @@
-import { IBasketData, ICard } from "../../types";
+import { IBasketData, ICard, TBasketCard, TGalleryCard } from "../../types";
 import { IEvents } from "../base/events";
 
 export class BasketData implements IBasketData {
@@ -9,13 +9,20 @@ export class BasketData implements IBasketData {
         this._cards = [];
     }
 
-    set cards(cards: ICard[]) {
+    set cards(cards: []) {
         this._cards = cards;
         this.basketDataChanged();
     }
 
-    get cards(): ICard[] {
-        return this._cards;
+    getBasketViewCards(): TBasketCard[] {
+        return this._cards.map((item, index) => {
+            return {
+                id: item.id,
+                title: item.title,
+                price: item.price,
+                index: index + 1
+            }
+        })
     }
 
     getCost() {
@@ -23,19 +30,19 @@ export class BasketData implements IBasketData {
         return this._cards.map((item) => item.price).reduce((a, b) => a + b);
     }
 
-    getCount() {
+    getQuantity() {
         return this._cards.length ?? 0;
     }
 
     add(card: ICard): void {
-        if (!this.contains(card)) {
+        if (!this.contains(card.id)) {
             this._cards.unshift(card);
             this.basketDataChanged();
         }
     }
 
     remove(card: ICard): void {
-        if (this.contains(card)) {
+        if (this.contains(card.id)) {
             this._cards = this._cards.filter(item => item.id !== card.id);
             this.basketDataChanged();
         }
@@ -46,12 +53,12 @@ export class BasketData implements IBasketData {
         this.basketDataChanged();
     }
 
-    getProductIdList() {
-        return this._cards.map(card => card.id) ;
+    getIdList() {
+        return this._cards.map(card => card.id);
     }
 
-    contains(card: ICard) {
-        return this._cards.some(item => item.id === card.id);
+    contains(id: string) {
+        return this._cards.some(item => item.id === id);
     }
 
     isEmpty(): boolean {

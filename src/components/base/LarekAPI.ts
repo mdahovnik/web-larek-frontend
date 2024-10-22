@@ -1,10 +1,10 @@
-import { ICard, TInitCards, TOrderResult, IOrder } from "../../types";
+import { ICard, TInitCards, TOrderResponse, IOrder } from "../../types";
 import { Api } from "./api";
 
 
 export interface ILarekAPI {
     getProductList: () => Promise<ICard[]>;
-    placeOrder: (order: IOrder) => Promise<TOrderResult>;
+    placeOrder: (order: IOrder) => Promise<TOrderResponse>;
 }
 
 export class LarekAPI extends Api implements ILarekAPI {
@@ -25,9 +25,9 @@ export class LarekAPI extends Api implements ILarekAPI {
             );
     }
 
-    placeOrder(order: IOrder): Promise<TOrderResult> {
+    placeOrder(order: IOrder): Promise<TOrderResponse> {
         return this.post('/order', order, 'POST')
-            .then((result: TOrderResult) => result);
+            .then((result: TOrderResponse) => result);
     }
 
 }

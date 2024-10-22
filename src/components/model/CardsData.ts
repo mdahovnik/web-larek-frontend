@@ -1,4 +1,4 @@
-import { ICard, ICardsData } from "../../types";
+import { ICard, ICardsData, TGalleryCard } from "../../types";
 import { IEvents } from "../base/events";
 
 export class CardsData implements ICardsData {
@@ -10,11 +10,7 @@ export class CardsData implements ICardsData {
 
     set list(cards: ICard[]) {
         this._list = cards;
-        this.events.emit('cards:changed');
-    }
-
-    get list() {
-        return this._list;
+        this.events.emit('cards-list:changed');
     }
 
     set selectedCard(id: string) {
@@ -30,8 +26,20 @@ export class CardsData implements ICardsData {
         return this._list.find(card => card.id === id);
     }
 
-    setCardBasketStatus(id: string, value: boolean){
-        this.getCard(id).isInBasket = value;
+    getGalleryCards(): TGalleryCard[] {
+        return this._list.map((item) => {
+            return {
+                id: item.id,
+                title: item.title,
+                price: item.price,
+                category: item.category,
+                image: item.image
+            }
+        })
     }
+
+    // setCardBasketStatus(id: string, value: boolean) {
+    //     this.getCard(id).isInBasket = value;
+    // }
 
 }

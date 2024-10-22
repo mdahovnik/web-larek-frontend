@@ -21,27 +21,17 @@ export class BasketView extends View<IBasketContent> {
         this._basketButton = container.querySelector('.basket__button');
         this._cost = container.querySelector('.basket__price');
 
-        // this.setEmitOnElementClick('basket:submit', this._basketButton);
         this._basketButton.addEventListener('click', () => {
             this.emitChanges('basket:submit', { data: this })
         });
     }
 
-    set cost(cost: number) {
-        this._cost.textContent = cost ? `${cost} синапсов` : `0 синапсов`;
-        this._basketButton?.toggleAttribute('disabled', cost === 0);
-    }
-
     set cards(cards: HTMLElement[]) {
-
         this._cards.replaceChildren(...cards);
-        this.numbering();
-
     }
 
-    numbering() {
-        let cardIndex: number = 1;
-        this.container.querySelectorAll('.basket__item-index')
-            .forEach(el => el.textContent = String(cardIndex++));
+    set cost(cost: number) {
+        this.setText(this._cost, cost ? `${cost} синапсов` : `0 синапсов`);
+        this.setDisabled(this._basketButton, cost === 0);
     }
 }

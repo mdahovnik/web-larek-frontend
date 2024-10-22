@@ -1,86 +1,104 @@
-import { ICard, TCardCatalog } from "../../types";
-import { CDN_URL } from "../../utils/constants";
+import { ICard } from "../../types";
 import { IEvents } from "../base/events";
 import { View } from "../common/View";
 
 
-export class CardView extends View<ICard> {
-    // protected _events: IEvents;
+export class CardView<T> extends View<T> {
     protected _cardCategory: HTMLSpanElement;
     protected _cardTitle: HTMLTitleElement;
     protected _cardImage: HTMLImageElement;
     protected _cardPrice: HTMLSpanElement;
     protected _cardText: HTMLParagraphElement;
     protected _button: HTMLButtonElement;
-    private _isInBasket: boolean;
+    protected _index: HTMLElement;
+    protected _isSelected: boolean;
 
     constructor(protected container: HTMLElement, events: IEvents) {
         super(container, events);
 
-        // this._events = events;
         this._cardCategory = this.container.querySelector('.card__category');
         this._cardTitle = this.container.querySelector('.card__title');
         this._cardImage = this.container.querySelector('.card__image');
         this._cardPrice = this.container.querySelector('.card__price');
         this._cardText = this.container.querySelector('.card__text');
         this._button = this.container.querySelector('.card__button');
-
-        if (this._cardText) {
-            this._button.addEventListener('click', () => {
-
-                if (this._isInBasket && this._cardCategory) {
-                    this.emitChanges('basket:remove', { data: this });
-                } else
-                    this.emitChanges('basket:add', { data: this });
-            });
-        }
+        this._index = this.container.querySelector('.basket__item-index');
 
         if (!this._button) {
             this.container.addEventListener('click', () => {
-                this.emitChanges('card-preview:changed', { data: this });
+                this.emitChanges('card-preview:changed', { card: this });
+            });
+        }
+
+        if (this._cardText) {
+            this._button.addEventListener('click', () => {
+                if (this._isSelected)
+                    this.emitChanges('basket:remove', { id: { card: this } });
+                else
+                    this.emitChanges('basket:add', { card: this });
+
+                this.emitChanges('card-preview-button:press')
             });
         }
 
         if (!this._cardCategory) {
             this._button.addEventListener('click', () => {
-                this.emitChanges('basket:remove', { data: this });
+                this.emitChanges('basket:remove', { card: this });
             });
         }
     }
 
     set category(category: string) {
-        if (this._cardCategory)
-            this._cardCategory.textContent = category;
+        this.setText(this._cardCategory, category);
+        this.setColor(category)
     }
 
     set title(title: string) {
-        if (this._cardTitle)
-            this._cardTitle.textContent = title;
+        this.setText(this._cardTitle, title);
     }
 
     set image(address: string) {
-        if (this._cardImage)
-            this._cardImage.src = address;
+        this.setImage(this._cardImage, address);
     }
 
     set price(price: number) {
-        this._cardPrice.textContent = price ? String(price) + ' синапсов' : 'Бесценно';
-        this._button?.toggleAttribute('disabled', Number(price) === 0);
+        this.setText(this._cardPrice, price ? String(price) + ' синапсов' : 'Бесценно');
+        this.setDisabled(this._button, Number(price) === 0)
     }
 
-    set description(text: string) {
-        if (this._cardText) {
-            this._cardText.textContent = text;
+    set description(value: string) {
+        this.setText(this._cardText, value);
+    }
+
+    set index(value: number) {
+        this.setText(this._index, value);
+    }
+
+    set canBuy(value: boolean) {
+        this._isSelected = value;
+
+        if (this._isSelected && this._cardCategory) {
+            this.setText(this._button, 'Удалить');
         }
     }
 
-    set isInBasket(value: boolean) {
-        this._isInBasket = value;
+    setColor(category: string) {
 
-        if (this._isInBasket && this._cardCategory) {
-            this._button.textContent = 'Удалить';
+        const CategoryColor = {
+            soft: "софт-скил",
+            hard: "хард-скил",
+            other: "другое",
+            additional: "дополнительное",
+            button: "кнопка"
         }
-    }
 
+        const color = (Object.keys(CategoryColor) as (keyof typeof CategoryColor)[])
+            .find(key => {
+                return CategoryColor[key] === category
+            });
+
+        this._cardCategory.classList.add(`card__category_${color}`);
+    }
 
 }
+

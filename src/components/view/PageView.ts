@@ -4,8 +4,8 @@ import { View } from "../common/View";
 import { IEvents } from "../base/events";
 
 interface IPage {
-    gallery?: HTMLElement[];
-    count?: number;
+    gallery: HTMLElement[];
+    count: number;
 }
 
 export class PageView extends View<IPage> {
@@ -20,7 +20,6 @@ export class PageView extends View<IPage> {
         this._basketCount = container.querySelector('.header__basket-counter');
         this._gallery = container.querySelector('.gallery');
 
-        // this.setEmitOnElementClick('basket:open', this._basket);
         this._basket.addEventListener('click', () => {
             this.emitChanges('basket:open', { data: this });
         });
@@ -30,8 +29,8 @@ export class PageView extends View<IPage> {
         this._gallery.replaceChildren(...elements);
     }
 
-    set count(data: number) {
-        this._basketCount.textContent = String(data);
+    set count(value: number) {
+        this.setText(this._basketCount, value);
     }
 
     

@@ -1,8 +1,10 @@
+import { isEmpty } from "../../utils/utils";
 import { IEvents } from "../base/events";
-import { ContactsView } from "./ContactsView";
+import { Form } from "../common/Form";
+import { ContactsView, IOrderForm } from "./ContactsView";
 
 
-export class OrderView extends ContactsView {
+export class OrderView extends Form<IOrderForm> {
 
     protected _orderButtons?: NodeListOf<HTMLButtonElement>;
     protected _payment: string;
@@ -11,14 +13,12 @@ export class OrderView extends ContactsView {
         super(container, events);
 
         this._orderButtons = this.container.querySelectorAll('button[type=button]');
-
+        
         this._orderButtons?.forEach(button => {
             button.addEventListener('click', () => {
                 this._payment = button.name;
-                // this.togglePaymentButton(payment);
-
                 this._orderButtons.forEach(button => {
-                    button.classList.toggle('button_alt-active', button.name === this._payment)
+                    this.toggleClass(button, 'button_alt-active', button.name === this._payment);
                 });
 
                 this.emitChanges(`${this._containerName}-payment:select`, { payment: this._payment });
@@ -29,12 +29,14 @@ export class OrderView extends ContactsView {
     set payment(value: string) {
         this._payment = value;
 
-        if (!value) {
-            this._orderButtons.forEach(button => {
-                button.classList.toggle('button_alt-active', false)
-            });
-        }
+        if (isEmpty(value))
+            this._orderButtons.forEach(button => { button.classList.remove('button_alt-active') });
     }
+
+    set address(value: string) {
+        (this.container.elements.namedItem('address') as HTMLInputElement).value = value;
+    }
+
 
     //TODO: сделать сброс кнопок после размещения ордера
     private togglePaymentButton(value: string) {

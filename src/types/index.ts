@@ -8,24 +8,26 @@ export interface ICard {
     title: string;
     category: string;
     price: number;
-    isInBasket: boolean;
+    canBuy: boolean;
+    index: number;
 }
 
 export interface ICardsData {
     list: ICard[];
-    // selectedCard: string | null;
+    selectedCard: string;
     getCard(id: string): ICard;
-    setCardBasketStatus(id: string, value: boolean): void;
+    getGalleryCards(): TGalleryCard[];
 }
-
 
 export interface IBasketData {
     cards: ICard[];
     getCost(): number;
-    getCount(): number;
+    getQuantity(): number;
     add(card: ICard): void;
     remove(card: ICard): void;
-    getProductIdList(): string[];
+    getIdList(): string[];
+    contains(id: string): boolean;
+    isEmpty(): boolean;
     clear(): void;
 }
 
@@ -41,28 +43,24 @@ export interface IOrder extends IContacts {
 
 export interface IOrderData {
     order: IOrder;
-    total: number;
-    items: string[];
-    status: boolean;
-    // getOrderStatus():void;
-    clearOrderData(): void;
-    clearContactsData(): void;
+    setField(field: keyof IOrder, value: string): void;
+    getOrderError(): TOrderError;
+    isOrderValid(): boolean;
+    isContactsValid(): boolean;
+    clearData(): void;
 }
 
-
-
 //TODO: перепроверить типы
+export type TOrderResponse = { id: string, total: number }
+export type TPayment = 'card' | 'cash';
+export type TOrderError = Partial<Pick<IOrder, 'payment' | 'address' | 'email' | 'phone'>>
 export type TInitCards = { total: number, items: ICard[] };
+export type TGalleryCard = Pick<ICard, 'image' | 'title' | 'category' | 'price' | 'id'>;
+export type TBasketCard = Pick<ICard, 'title' | 'price' | 'id' | 'index'>;
+
 // export type TOrderProducts = string[];
 // export type TFormOrder = Pick<IOrderData, 'payment' | 'address'>;//
-export type TPayment = 'card' | 'cash';
 // export type TOrder = Pick<IOrderData, 'payment' | 'address' | 'email' | 'phone' | 'total' | 'items'>;
-export type TOrderResult = { id: string, total: number }
-export type TOrderError = Partial<Pick<IOrder, 'payment' | 'address' | 'email' | 'phone'>>
-
-
-export type TCardCatalog = Pick<ICard, 'image' | 'title' | 'category' | 'price'>;
-export type TCardModal = Pick<ICard, 'description' | 'image' | 'title' | 'category' | 'price'>;
-export type TCardBasket = Pick<ICard, 'title' | 'price' | 'id'>;
+// export type TPreviewCard = Pick<ICard, 'description' | 'image' | 'title' | 'category' | 'price' | 'id'>;
 // export type TOrderContacts = Pick<IOrderData, 'email' | 'phone'>;//
-// export type TBasketData = Pick<IBasketData, 'cards' | 'cost'>;
+// export type TBasketData = Pick<IBasketData, 'cards' | 'cost'>;selectedCardselectedCardselectedCardselectedCard
