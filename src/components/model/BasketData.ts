@@ -41,9 +41,9 @@ export class BasketData implements IBasketData {
         }
     }
 
-    remove(card: ICard): void {
-        if (this.contains(card.id)) {
-            this._cards = this._cards.filter(item => item.id !== card.id);
+    remove(id: string): void {
+        if (this.contains(id)) {
+            this._cards = this._cards.filter(item => item.id !== id);
             this.basketDataChanged();
         }
     }

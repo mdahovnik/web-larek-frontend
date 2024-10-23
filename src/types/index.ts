@@ -24,7 +24,7 @@ export interface IBasketData {
     getCost(): number;
     getQuantity(): number;
     add(card: ICard): void;
-    remove(card: ICard): void;
+    remove(id: string): void;
     getIdList(): string[];
     contains(id: string): boolean;
     isEmpty(): boolean;

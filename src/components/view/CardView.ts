@@ -13,6 +13,7 @@ export class CardView<T> extends View<T> {
     protected _button: HTMLButtonElement;
     protected _index: HTMLElement;
     protected _isSelected: boolean;
+    protected id: string;
 
     constructor(protected container: HTMLElement, events: IEvents) {
         super(container, events);
@@ -27,24 +28,24 @@ export class CardView<T> extends View<T> {
 
         if (!this._button) {
             this.container.addEventListener('click', () => {
-                this.emitChanges('card-preview:changed', { card: this });
+                this.emitChanges('card-preview:changed', { id: this.id });
             });
         }
 
         if (this._cardText) {
             this._button.addEventListener('click', () => {
                 if (this._isSelected)
-                    this.emitChanges('basket:remove', { card: this });
+                    this.emitChanges('basket:remove', { id: this.id });
                 else
-                    this.emitChanges('basket:add', { card: this });
+                    this.emitChanges('basket:add', { id: this.id });
 
-                this.emitChanges('card-preview-button:press')
+                this.emitChanges('card-button:press')
             });
         }
 
         if (!this._cardCategory) {
             this._button.addEventListener('click', () => {
-                this.emitChanges('basket:remove', { card: this });
+                this.emitChanges('basket:remove', { id: this.id });
             });
         }
     }
@@ -83,7 +84,7 @@ export class CardView<T> extends View<T> {
         }
     }
 
-    setColor(category: string) {
+    protected setColor(category: string) {
         const color = (Object.keys(CategoryColor) as (keyof typeof CategoryColor)[])
             .find(key => {
                 return CategoryColor[key] === category

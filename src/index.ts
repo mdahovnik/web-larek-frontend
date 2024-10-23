@@ -61,19 +61,19 @@ events.on('cards-list:changed', () => {
 /**
  * MAIN PAGE
  */
-events.on('card-preview:changed', (event: { card: ICard }) => {
+events.on('card-preview:changed', (event: { id: string }) => {
     const cardPreview = new CardView<ICard>(cloneTemplate('#card-preview'), events);
-    const selectedCard = cards.getCard(event.card.id);
+    const selectedCard = cards.getCard(event.id);
 
     modalView.render({
         content: cardPreview.render({
             ...selectedCard,
-            canBuy: basket.contains(event.card.id)
+            canBuy: basket.contains(event.id)
         })
     });
 })
 
-events.on('card-preview-button:press', (event: { data: ICard }) => {
+events.on('card-button:press', () => {
     modalView.close();
 })
 
@@ -81,12 +81,12 @@ events.on('card-preview-button:press', (event: { data: ICard }) => {
 /**
  * BASKET
  */
-events.on('basket:add', (event: { card: ICard }) => {//TODO: получить id из презентера
-    basket.add(cards.getCard(event.card.id));
+events.on('basket:add', (event: { id: string }) => {
+    basket.add(cards.getCard(event.id));
 })
 
-events.on('basket:remove', (event: { card: ICard }) => {
-    basket.remove(event.card);
+events.on('basket:remove', (event: { id: string }) => {
+    basket.remove(event.id);
 })
 
 events.on('basket-data:change', () => {
