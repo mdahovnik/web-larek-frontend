@@ -7,7 +7,6 @@ export interface IBasketContent {
 }
 
 export class BasketView extends View<IBasketContent> {
-
     protected _cards: HTMLUListElement;
     protected _basketItemIndex: HTMLElement;
     protected _basketButton: HTMLButtonElement;

@@ -31,17 +31,15 @@ export class ModalView extends View<IModalContent> {
 
     open() {
         this.container.classList.add('modal_active');
-        this.container.classList.add('page__wrapper_locked');
         document.addEventListener('keyup', this.handleEscUp);
-        this.events.emit('modal:open');
+        this.emitChanges('modal:open');
     }
 
     close() {
         this.container.classList.remove('modal_active');
-        this.container.classList.remove('page__wrapper_locked');
-        // this.content = null;
+        this.content = null;
         document.removeEventListener('keyup', this.handleEscUp);
-        this.events.emit('modal:close');
+        this.emitChanges('modal:close');
     }
 
     protected handleEscUp(event: KeyboardEvent) {

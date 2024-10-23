@@ -5,7 +5,6 @@ import { ContactsView, IOrderForm } from "./ContactsView";
 
 
 export class OrderView extends Form<IOrderForm> {
-
     protected _orderButtons?: NodeListOf<HTMLButtonElement>;
     protected _payment: string;
 
@@ -13,7 +12,7 @@ export class OrderView extends Form<IOrderForm> {
         super(container, events);
 
         this._orderButtons = this.container.querySelectorAll('button[type=button]');
-        
+
         this._orderButtons?.forEach(button => {
             button.addEventListener('click', () => {
                 this._payment = button.name;
@@ -21,7 +20,7 @@ export class OrderView extends Form<IOrderForm> {
                     this.toggleClass(button, 'button_alt-active', button.name === this._payment);
                 });
 
-                this.emitChanges(`${this._containerName}-payment:select`, { payment: this._payment });
+                this.emitChanges('order-payment:select', { payment: this._payment });
             })
         })
     }
@@ -30,20 +29,13 @@ export class OrderView extends Form<IOrderForm> {
         this._payment = value;
 
         if (isEmpty(value))
-            this._orderButtons.forEach(button => { button.classList.remove('button_alt-active') });
+            this._orderButtons.forEach(button => {
+                button.classList.remove('button_alt-active')
+            });
     }
 
     set address(value: string) {
         (this.container.elements.namedItem('address') as HTMLInputElement).value = value;
     }
-
-
-    //TODO: сделать сброс кнопок после размещения ордера
-    private togglePaymentButton(value: string) {
-        this._orderButtons.forEach(button => {
-            button.classList.toggle('button_alt-active', button.name === value)
-        });
-    }
-
 
 }

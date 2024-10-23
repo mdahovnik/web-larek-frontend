@@ -14,12 +14,12 @@ export class Form<T> extends View<T> {
         this._submitButton = this.container.querySelector('button[type=submit]');
         this._containerName = this.container.getAttribute('name');
         this._error = this.container.querySelector('.form__errors');
-        
+
         this.container.addEventListener('input', (event) => {
             const input = (event.target as HTMLInputElement);
-            const name = input.name;
+            const field = input.name;
             const value = input.value;
-            this.emitChanges(`${this._containerName}-${name}:input`, { value })
+            this.emitChanges(`${this._containerName}:input`, { field, value })
         });
 
         this.container.addEventListener('submit', (evt) => {
@@ -33,17 +33,17 @@ export class Form<T> extends View<T> {
         else this.hideInputError();
     }
 
-    set valid(isValid: boolean){
+    set valid(isValid: boolean) {
         this._valid = isValid;
         this._submitButton.toggleAttribute('disabled', !isValid);
     }
 
     private showInputError(errorMessage: string) {
-        this._error.textContent = 'Укажите ' + errorMessage;
+        this.setText(this._error, 'Укажите ' + errorMessage)
     }
 
     private hideInputError() {
-        this._error.textContent = '';
+        this.setText(this._error, '')
     }
 
     reset() {

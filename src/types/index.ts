@@ -47,7 +47,7 @@ export interface IOrderData {
     getOrderError(): TOrderError;
     isOrderValid(): boolean;
     isContactsValid(): boolean;
-    clearData(): void;
+    clear(): void;
 }
 
 //TODO: перепроверить типы

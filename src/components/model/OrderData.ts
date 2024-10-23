@@ -3,7 +3,6 @@ import { IEvents } from "../base/events";
 
 //TODO: убрать не нужные методы
 export class OrderData implements IOrderData {
-
     protected _orderErrors: TOrderError;
     protected _order: IOrder = {
         payment: '',
@@ -30,9 +29,9 @@ export class OrderData implements IOrderData {
             this.eventsEmit('contacts-data:change');
     }
 
-    clearData() {
+    clear() {
         (Object.keys(this._order) as (keyof typeof this._order)[])
-            .forEach((key) => { this._order[key] = '' });
+            .forEach(key => { this._order[key] = '' });
 
         this.validateOrder();
     }
@@ -60,7 +59,6 @@ export class OrderData implements IOrderData {
         if (!this._order.phone) errors.phone = 'телефон';
 
         this._orderErrors = errors;
-        // this.events.emit('order-errors:change', this._orderErrors);
     }
 
     protected eventsEmit(eventName: string) {

@@ -8,7 +8,6 @@ export interface IOrderSuccess {
 }
 
 export class SuccessView extends View<IOrderSuccess> {
-
     protected _description: HTMLElement;
     protected _successButton: HTMLButtonElement;
 
@@ -18,15 +17,9 @@ export class SuccessView extends View<IOrderSuccess> {
         this._successButton = container.querySelector('.order-success__close');
 
         this._successButton?.addEventListener('click', () => {
-            this.events.emit(`${this.container.className}:submit`);
+            this.emitChanges(`${this.container.className}:submit`);
         })
-
     }
-
-    // set title(value: string) {
-    //     this._title.textContent = value;
-    // }
-
 
     set description(value: string) {
         this.setText(this._description, value);

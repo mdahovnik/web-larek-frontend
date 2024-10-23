@@ -40,13 +40,17 @@ events.onAll((event) => {
     console.log(event.eventName, event.data);
 });
 
-// загрузка данных
+/**
+ * INITIAL LOAD
+ */
 api.getProductList().then(data => {
     cards.list = data;
 }).catch(err => console.error(err))
 
 
-//рендеринг всех карточек товаров
+/**
+ * GALLERY
+ */
 events.on('cards-list:changed', () => {
     pageView.render({
         gallery: cards.getGalleryCards().map(cardData => {
@@ -58,17 +62,18 @@ events.on('cards-list:changed', () => {
     });
 })
 
+
 /**
- * MAIN PAGE
+ * CARD PREVIEW
  */
-events.on('card-preview:changed', (event: { id: string }) => {
+events.on('card-preview:changed', (card: { id: string }) => {
     const cardPreview = new CardView<ICard>(cloneTemplate('#card-preview'), events);
-    const selectedCard = cards.getCard(event.id);
+    const selectedCard = cards.getCard(card.id);
 
     modalView.render({
         content: cardPreview.render({
             ...selectedCard,
-            canBuy: basket.contains(event.id)
+            canBuy: basket.contains(card.id)
         })
     });
 })
@@ -81,12 +86,12 @@ events.on('card-button:press', () => {
 /**
  * BASKET
  */
-events.on('basket:add', (event: { id: string }) => {
-    basket.add(cards.getCard(event.id));
+events.on('basket:add', (card: { id: string }) => {
+    basket.add(cards.getCard(card.id));
 })
 
-events.on('basket:remove', (event: { id: string }) => {
-    basket.remove(event.id);
+events.on('basket:remove', (card: { id: string }) => {
+    basket.remove(card.id);
 })
 
 events.on('basket-data:change', () => {
@@ -114,7 +119,7 @@ events.on('basket:open', () => {
 })
 
 events.on('basket:submit', () => {
-    order.clearData();
+    order.clear();
     orderView.reset();
     const { payment, address } = order.getOrderError();
 
@@ -131,12 +136,12 @@ events.on('basket:submit', () => {
 /**
  * ORDER FORM
  */
-events.on('order-form-payment:select', (event: { payment: TPayment }) => {
-    order.setField('payment', event.payment);
+events.on('order-payment:select', (data: { payment: TPayment }) => {
+    order.setField('payment', data.payment);
 })
 
-events.on('order-form-address:input', (event: { value: string }) => {
-    order.setField('address', event.value);
+events.on('order-form:input', (data: { field: keyof IOrder, value: string }) => {
+    order.setField(data.field, data.value);
 })
 
 events.on('order-data:change', (errors: Partial<IOrder>) => {
@@ -148,7 +153,6 @@ events.on('order-data:change', (errors: Partial<IOrder>) => {
 })
 
 events.on('order-form:submit', () => {
-    order.clearData();
     contactsView.reset();
     const { email, phone } = order.getOrderError();
 
@@ -164,12 +168,8 @@ events.on('order-form:submit', () => {
 /**
  * CONTACTS FORM
  */
-events.on('contacts-form-email:input', (event: { value: string }) => {
-    order.setField('email', event.value)
-})
-
-events.on('contacts-form-phone:input', (event: { value: string }) => {
-    order.setField('phone', event.value);
+events.on('contacts-form:input', (data: { field: keyof IOrder, value: string }) => {
+    order.setField(data.field, data.value)
 })
 
 events.on('contacts-data:change', (errors: Partial<IOrder>) => {
@@ -179,7 +179,6 @@ events.on('contacts-data:change', (errors: Partial<IOrder>) => {
         error: getErrorMessage({ email, phone })
     });
 })
-
 
 events.on('contacts-form:submit', () => {
     const orderData = Object.assign(
@@ -209,10 +208,13 @@ events.on('order-success:submit', () => {
     modalView.close();
 })
 
+
+/**
+ * MODAL
+ */
 events.on('modal:open', () => {
     pageView.locked = true;
 });
-
 
 events.on('modal:close', () => {
     pageView.locked = false;

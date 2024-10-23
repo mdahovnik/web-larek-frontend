@@ -4,7 +4,6 @@ export abstract class View<T> {
     constructor(protected readonly container: HTMLElement, protected events: IEvents) {}
 
     emitChanges(event: string, payload?: object) {
-        // Состав данных можно модифицировать
         this.events.emit(event, payload ?? {});
     }
 
@@ -39,17 +38,4 @@ export abstract class View<T> {
         return this.container;
     }
 
-    // toggleDisabledAttribute<T>(element: HTMLElement, value: T) {
-    //     if (!value) {
-    //         element?.setAttribute('disabled', 'disabled');
-    //     }
-    //     else element?.removeAttribute('disabled');
-    // }
-
-    // TODO: унифицировать
-    // setEmitOnElementClick<T>(event: string, element: HTMLElement) {
-    //     element.addEventListener('click', () => {
-    //         this.events.emit(event, { data: this });
-    //     });
-    // }
 }

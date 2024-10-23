@@ -2,7 +2,6 @@ import { IBasketData, ICard, TBasketCard, TGalleryCard } from "../../types";
 import { IEvents } from "../base/events";
 
 export class BasketData implements IBasketData {
-
     protected _cards: ICard[];
 
     constructor(protected events: IEvents) {
@@ -27,7 +26,9 @@ export class BasketData implements IBasketData {
 
     getCost() {
         if (!this._cards.length) return 0;
-        return this._cards.map((item) => item.price).reduce((a, b) => a + b);
+        return this._cards
+            .map((item) => item.price)
+            .reduce((a, b) => a + b);
     }
 
     getQuantity() {
@@ -65,17 +66,8 @@ export class BasketData implements IBasketData {
         return this._cards.length === 0;
     }
 
-    //TODO: определить возвращаемый тип
-    // getFullBasketData() {
-    //     return {
-    //         "total": this.cost,
-    //         "items": this.getBasketProductsIds()
-    //     }
-    // }
-
     protected basketDataChanged() {
         this.events.emit('basket-data:change', { data: this })
     }
-
 
 }
