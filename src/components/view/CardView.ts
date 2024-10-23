@@ -1,7 +1,7 @@
 import { ICard } from "../../types";
 import { CategoryColor } from "../../utils/constants";
 import { IEvents } from "../base/events";
-import { View } from "../common/View";
+import { View } from "../base/View";
 
 
 export class CardView<T> extends View<T> {
@@ -84,7 +84,7 @@ export class CardView<T> extends View<T> {
         }
     }
 
-    protected setColor(category: string) {
+    protected setColor(category: string): void {
         const color = (Object.keys(CategoryColor) as (keyof typeof CategoryColor)[])
             .find(key => {
                 return CategoryColor[key] === category

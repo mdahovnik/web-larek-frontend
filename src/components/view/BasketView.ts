@@ -1,4 +1,4 @@
-import { View } from "../common/View";
+import { View } from "../base/View";
 import { IEvents } from "../base/events";
 
 export interface IBasketContent {
@@ -21,7 +21,7 @@ export class BasketView extends View<IBasketContent> {
         this._cost = container.querySelector('.basket__price');
 
         this._basketButton.addEventListener('click', () => {
-            this.emitChanges('basket:submit', { data: this })
+            this.emitChanges('basket:submit')
         });
     }
 

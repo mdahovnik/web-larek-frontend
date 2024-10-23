@@ -1,7 +1,7 @@
 import { isEmpty } from "../../utils/utils";
 import { IEvents } from "../base/events";
 import { Form } from "../common/Form";
-import { ContactsView, IOrderForm } from "./ContactsView";
+import { IOrderForm } from "./ContactsView";
 
 
 export class OrderView extends Form<IOrderForm> {

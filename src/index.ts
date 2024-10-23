@@ -182,7 +182,7 @@ events.on('contacts-data:change', (errors: Partial<IOrder>) => {
 
 events.on('contacts-form:submit', () => {
     const orderData = Object.assign(
-        order.order,
+        { ...order.order },
         {
             total: basket.getCost(),
             items: basket.getIdList()

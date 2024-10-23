@@ -1,4 +1,4 @@
-import { View } from "../common/View";
+import { View } from "../base/View";
 import { IEvents } from "../base/events";
 
 interface IModalContent {

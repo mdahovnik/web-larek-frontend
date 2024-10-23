@@ -1,5 +1,5 @@
 import { IEvents } from "../base/events";
-import { View } from "./View";
+import { View } from "../base/View";
 
 
 export class Form<T> extends View<T> {

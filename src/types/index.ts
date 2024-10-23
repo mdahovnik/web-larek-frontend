@@ -58,9 +58,3 @@ export type TInitCards = { total: number, items: ICard[] };
 export type TGalleryCard = Pick<ICard, 'image' | 'title' | 'category' | 'price' | 'id'>;
 export type TBasketCard = Pick<ICard, 'title' | 'price' | 'id' | 'index'>;
 
-// export type TOrderProducts = string[];
-// export type TFormOrder = Pick<IOrderData, 'payment' | 'address'>;//
-// export type TOrder = Pick<IOrderData, 'payment' | 'address' | 'email' | 'phone' | 'total' | 'items'>;
-// export type TPreviewCard = Pick<ICard, 'description' | 'image' | 'title' | 'category' | 'price' | 'id'>;
-// export type TOrderContacts = Pick<IOrderData, 'email' | 'phone'>;//
-// export type TBasketData = Pick<IBasketData, 'cards' | 'cost'>;selectedCardselectedCardselectedCardselectedCard

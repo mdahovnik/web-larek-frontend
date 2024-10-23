@@ -1,5 +1,5 @@
 import { IEvents } from "../base/events";
-import { View } from "../common/View";
+import { View } from "../base/View";
 
 
 export interface IOrderSuccess {

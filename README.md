@@ -42,8 +42,7 @@ yarn build
 ```
 ## Данные и типы данных, используемые в приложении
 
-карточка
-
+Карточка
 ```
 export interface ICard {
     id: string;
@@ -51,63 +50,66 @@ export interface ICard {
     image: string;
     title: string;
     category: string;
-    price: string
+    price: number;
+    canBuy: boolean;
+    index: number;
 }
 ```
-
+Контакты
+```
+export interface IContacts {
+    email: string;
+    phone: string;
+}
+```
 Заказ
-
 ```
 export interface IOrder {
     payment: string;
     email: string;
-    phoneNumber: string;
-    address: string;
 }
 ```
 Результат выполнения заказа
-
 ```
 export interface IOrderResult {
     id: string;
     total: number;
 }
 ```
-
 Интерфейс модели данных карточек в веб-ларьке
-
 ```
 export interface ICardData {
-    cards: ICard[];
-    selectedCard: string | null;
-    getCard(id: string): ICard;
+    list: ICard[];
+    selectedCard: string;
 }
 ```
 Данные карточки для отображения на главной странице
-
 ```
-export type TCardBase = Pick<ICard, 'image' | 'title' | 'category' | 'price'>;
+export type TGalleryCard = Pick<ICard, 'image' | 'title' | 'category' | 'price' | 'id'>;
 ```
 Данные карточки используемые в окне с подробной информацией
-
 ```
 export type TCardModal = Pick<ICard, 'description' | 'image' | 'title' | 'category' | 'price'>;
 ```
 Данные карточки используемые при просмотре корзины
-
 ```
-export type TCardBasket = Pick<ICard, 'title' | 'price' | 'id'>;
+export type TBasketCard = Pick<ICard, 'title' | 'price' | 'id' | 'index'>;
 ```
-Данные карточки для формирования заказа
-
+Данные ордера для выбора способа оплаты
 ```
-export type TCardOrder = Pick<ICard, 'id'>;
+export type TPayment = 'card' | 'cash';
 ```
 Данные используемые для валидации форм
-
 ```
-export type TOrderPayment = Pick<IOrder, 'payment' | 'address'>;
-export type TOrderContacts = Pick<IOrder, 'email' | 'phone'>;
+export type TOrderError = Partial<Pick<IOrder, 'payment' | 'address' | 'email' | 'phone'>>
+```
+Данные для начальной инициализации
+```
+export type TInitCards = { total: number, items: ICard[] };
+```
+Данные для результата размещения ордера
+```
+export type TOrderResponse = { id: string, total: number }
 ```
 
 ## Архитектура приложения
@@ -120,11 +122,12 @@ export type TOrderContacts = Pick<IOrder, 'email' | 'phone'>;
 Содержит в себе базовую логику отправки запросов.
 
 *Конструктор :*
-- принимает базовую часть адреса сервера и опционально объект с заголовками запросов.
+- `constructor(baseUrl: string, options: RequestInit = {})` - принимает базовую часть адреса сервера и опционально объект с заголовками запросов.
 
 *Методы :*
 - `get` - выполняет GET запрос, параметром принимает endpoint запроса и возвращает promise с объектом которым ответил сервер.
 - `post` - параметрами принимает endpoint и объект с данными, которые будут переданы в JSON в теле запроса. По умолчанию выполняется POST запрос, но метод запроса может быть переопределен заданием третьего параметра.
+- `handleResponse(response: Response): Promise<object>` - содержит общую для всех методов запроса логику обработки состояния `Promise.reject`.
 
 #### Класс EventEmitter
 Брокер событий позволяет подписываться на события и отправлять события. В слоях приложения используется для генерации событий, а в presenter для их обработки.
@@ -177,32 +180,56 @@ export type TOrderContacts = Pick<IOrder, 'email' | 'phone'>;
 
 *Поля :*
 - `_order: IOrder` - заказ.
-- `_status: IOrderResult` - результат выполненного заказа
-- `_isOrderValid: boolean` - валидность составленного заказа.
+- `_orderErrors: TOrderError` - объект для хранения ошибок валидации форм.
 - `events: IEvents` - экземпляр класса `EventEmitter` для инициации событий при изменении данных.
 
+*Геттер *
+- `order()` - для получения объекта заказа.
+
 *Методы :*
-- `checkValidation(data: Record<keyof TOrderValidation, string>): boolean` - проверяет заказ на валидность.
-- `sendOrder(order: IOrder): void` - отправляет ордер на сервер и вызывает событие изменения статуса заказа. 
-- сеттеры и геттеры для сохранения и получения данных из полей класса.
+- `setField(field: keyof IOrder, value: string): void` - для заполнения ключей объекта ордере значениями полученными с форм.
+- `clear(): void` - прописывает в значения полей ордера пустые строки.
+- `getOrderError(): TOrderError` - для получения объекта с ошибками.
+- `isOrderValid(): boolean` - проверяет поля ордера заполненные из `OrderView` и используется для блокировки кнопки формы.
+- `isContactsValid(): boolean` - проверяет поля ордера заполненные из `ContactsView` и используется для блокировки кнопки формы.
+- `validateOrder(): void` - проверяет ключи `_order` на валидность и генерирует ошибки в соответствующие ключи `_orderErrors`.
 
 
 ### Слой представления
 Все классы представления отвечают за отображение внутри контейнера (DOM-элемент) передаваемых в них данных.
 
-#### Класс Modal
+#### Класс View
+Базовый класс представления содержит методы управления DOM-элементами.
+
+*Конструктор :*
+- `constructor(protected readonly container: HTMLElement, protected events: IEvents)` - принимает элемент  на основе шаблона и экземпляр класса `EventEmitter` для возможности инициации событий.
+
+*Методы :*
+- `setText(element: HTMLElement, value: unknown)` - для установки текстовых данных.
+- `emitChanges(event: string, payload?: object)` - для установки событий с соответствующими именами через `events.emit`.
+- `setDisabled(element: HTMLElement, state: boolean)` - для управления состоянием блокировки элементов.
+- `setImage(element: HTMLImageElement, src: string, alt?: string)` - устанавливает изображение с альтернативным текстом(опционально).
+- `toggleClass(element: HTMLElement, className: string, force?: boolean)` - для переключения класса у элемента
+- `render(data?: Partial<T>): HTMLElement` - отображает элемент представления.
+
+
+#### Класс ModalView
 Реализует модальное окно. Устанавливает слушатели на клавиатуру, для закрытия модального окна по `Esc`, на клик в оверлей и кнопку-крестик для закрытия модального окна. Генерация событий `modal:open`, `modal:close`. 
 
 *Конструктор :*
 - `constructor(protected container: HTMLElement, protected events: IEvents)` - принимает элемент модального окна на основе шаблона и экземпляр класса `EventEmitter` для возможности инициации событий.
 
 *Поля :*
-- `modalContent` - содержимое модального окна
-- `events: IEvents` - брокер событий
+- `_closeBtn: HTMLButtonElement` - элемент кнопки закрытия модального окна.
+- `_content: HTMLElement` - хранит содержимое модального окна
+
+*Сеттеры :*
+- `content(content: HTMLElement)` - размещает контент в модальном окне.
 
 *Методы :*
 - `open` и `close` - для управления отображением модального окна и генерации соответствующих событий.
-- `render` - отображает модальное окно
+- `render` - отображает модальное окно.
+- `handleEscUp(event: KeyboardEvent)` - реализует закрытие модального окна по клавише `Esc`.
 
 #### Класс Form
 Компонент формы.
@@ -211,105 +238,131 @@ export type TOrderContacts = Pick<IOrder, 'email' | 'phone'>;
 - `constructor(protected container: HTMLElement, protected events: IEvents)` - принимает элемент формы на основе шаблона и экземпляр класса `EventEmitter` для возможности инициации событий.
 
 *Поля :*
-- `_submitBtn` - для элемента кнопки подтверждения
-- `_errors` - для изменения сообщений об ошибках валидации в форме
+- `_error: HTMLElement` - для вывода сообщений об ошибках валидации в форме
+- `_valid: boolean` - для изменения состояния кнопки `submit`
+- `_submitButton: HTMLButtonElement` - для элемента кнопки подтверждения
+- `_containerName: string` - хранит имя контейнера
+
+*Сеттеры :*
+- `valid(isValid: boolean)` - изменяет активность кнопки подтверждения
+- `error(error: string)` - устанавливает текс ошибки в элемент отображения
 
 *Методы :*
-- `render` -  готовит компонент формы, используя переданное состояние
-- `onInputChange` - вызывает событие `form-input-field:change`
-- `setValid(isValid: boolean): void` - изменяет активность кнопки подтверждения
-- `getInputValues(): Record<string, string>` - возвращает объект с данными из полей формы, где ключ - name инпута, значение - данные введенные пользователем
-- `setInputValues(data: Record<string, string>): void` - принимает объект с данными для заполнения полей формы
-- `setError(data: { field: string, value: string, validInformation: string }): void` - принимает объект с данными для отображения или сокрытия текстов ошибок под полями ввода
-- `showInputError (field: string, errorMessage: string): void` - отображает полученный текст ошибки под указанным полем ввода
-- `hideInputError (field: string): void` - очищает текст ошибки под указанным полем ввода
-- `close (): void` - расширяет родительский метод дополнительно при закрытии очищая поля формы и деактивируя кнопку сохранения
+- `showInputError(errorMessage: string)` - для вывода ошибки валидации
+- `hideInputError()` - для скрытия ошибки валидации.
+- `reset()` - для сброса форм.
 
-
-#### Класс Card
-Отвечает за отображение карточки, задавая в карточке данные названия, описание, изображения, категорию, стоимость товара.Класс используется для отображения карточек на странице сайта. В классе устанавливаются слушатели на все интерактивные элементы, в результате взаимодействия с которыми пользователя генерируются соответствующие события.
+#### Класс CardView
+Отвечает за отображение карточки, задавая в карточке данные названия, описание, изображения, категорию, стоимость товара. Класс используется для отображения карточек на странице сайта. В классе устанавливаются слушатели на все интерактивные элементы, в результате взаимодействия с которыми пользователя генерируются соответствующие события.
 
 *Конструктор :*
 - `constructor(protected container: HTMLElement, protected events: IEvents)` - принимает элемент карточки на основе шаблона и экземпляр класса `EventEmitter` для возможности инициации событий.
 
 *Поля :*
-- Поля класса содержат элементы разметки элементов карточки. 
+- `_cardCategory: HTMLSpanElement` - элемент категории товара.
+- `_cardTitle: HTMLTitleElement` - элемент заголовка товара.
+- `_cardImage: HTMLImageElement` - элемент изображения товара.
+- `_cardPrice: HTMLSpanElement` - элемент стоимости товара.
+- `_cardText: HTMLParagraphElement` - элемент описания товара.
+- `_button: HTMLButtonElement` - элемент кнопка товара
+- `_index: HTMLElement` - элемент отображения порядкового номера товара в корзине.
+- `_isSelected: boolean` - флаг (карточка в корзине или нет).
+- `id: string` - id карточки для передачи в `events.emit`.
+
+*Сеттеры :*
+- `category(category: string)` - устанавливает категорию и ее цвет.
+- `title(title: string)` - устанавливает заголовок.
+- `image(address: string)` - устанавливает изображение.
+- `price(price: number)` - устанавливает стоимость товара.
+- `description(value: string)` - устанавливает описание товара.
+- `index(value: number)` - устанавливает порядковый номер товара в корзине.
+- `canBuy(value: boolean)` - устанавливает значение `_isSelected` и в зависимости от него меняет название кнопки карточки на `Удалить`
 
 *Методы :*
-- `setData(cardData: ICard): void` - заполняет атрибуты элементов карточки данными.
-- `render(): HTMLElement` - метод возвращает полностью заполненную карточку с установленным слушателем.
-- геттер `id` возвращает уникальный `id` карточки
+- `setColor(category: string): void` - устанавливает цвет на элемент категории товара используя для этого объект `CategoryColor`, путем подстановки ключа (соответствующего значению категории товара полученной от сервера по каждой карточке) в строку генерации селектора стилей отвечающих за цвет.
 
-#### Класс Basket
+
+#### Класс BasketView
 Отвечает за отображение корзины. Предоставляет сеттеры для изменения отображения корзины.
 
 *Конструктор :*
 - `constructor(protected container: HTMLElement, protected events: IEvents)` - принимает элемент корзины на основе шаблона и экземпляр класса `EventEmitter` для возможности инициации событий.
 
 *Поля :*
-- `template` - элемент шаблона корзины
-- `_cardsList` - элемент содержимого корзины (карточек товаров)
-- `_count` - элемент суммы товаров в корзине
-- `_button` - элемент кнопки оформления заказа в корзине
+- `_cards` - элемент содержимого корзины (карточек товаров).
+- `_basketItemIndex` - элемент отображения индекса карточки товара в корзине.
+- `_cost` - элемент стоимости товаров в корзине.
+- `_basketButton` - элемент кнопки оформления заказа в корзине.
 
-*Методы :*
-- `toggleButton(): void` - меняет состояние активности кнопки на переданное
+*Сеттеры :*
+- `cards(cards: HTMLElement[])` - размещает карточки в корзине.
+- `cost(cost: number)` - меняет состояние активности кнопки на переданное.
 
-
-#### Класс OrderForm
-Реализует компонент формы отправки заказа.
+#### Класс OrderView
+Реализует компонент формы заказа.
 
 *Конструктор :*
-- принимает контейнер с формой и брокер событий
+- `constructor(protected container: HTMLElement, protected events: IEvents)` - принимает элемент формы ордера на основе шаблона и экземпляр класса `EventEmitter` для возможности инициации событий.
 
 *Поля :*
-- `_cashBtn` - кнопка выбора оплатой при получении
-- `_cardBtn` - кнопка выбора оплаты картой
-- `_address` - поле адреса
+- `_orderButtons?: NodeListOf<HTMLButtonElement>` - кнопки выбора типа оплаты.
+- `_payment: string` - поле для хранения способа оплаты.
 
+*Сеттеры :*
+- `payment(value: string)` - для сброса поля `_payment` и состояния кнопок выбора способа оплаты.
+- `address(value: string)` - для установки поля ввода адреса.
 
-#### Класс ContactsForm
+#### Класс ContactsView
 Реализует компонент формы контактов.
 
 *Конструктор :*
-- принимает контейнер с формой и брокер событий
+- `constructor(protected container: HTMLElement, protected events: IEvents)` - принимает элемент формы контактов на основе шаблона и экземпляр класса `EventEmitter` для возможности инициации событий.
 
-*Поля :*
-- `_email` - поле с email
-- `_phone` - поле с телефоном
+*Сеттеры :*
+- `email(value: string)` - для установки поля ввода с email.
+- `phone(value: string)` - для установки поля ввода с телефоном.
 
-#### Класс OrderSuccess
+#### Класс SuccessView
 Отвечает за отображение окна с подтверждением заказа.
 
 *Конструктор :*
-- принимает DOM-элемент окна на базе шаблона и брокер событий
+- constructor(protected container: HTMLElement, protected events: IEvents)принимает элемент окна на базе шаблона и экземпляр класса `EventEmitter` для возможности инициации событий.
 
 *Поля :*
-- `_closeBtn` - элемент кнопки закрытия окна
-- `_total` - элемент с суммой заказа
+- `title: string`  - элемент заголовка.
+- `description: string` - элемент для указания списанной за ордер суммы.
 
 *Сеттеры :*
-- `total` - меняет содержимое элемента с суммой заказа
+- `description(value: string)` - меняет содержимое элемента с суммой заказа.
 
-#### Класс Page
+#### Класс PageView
 Отвечает за отображение блока с карточками на главной странице .
 
 *Конструктор :*
-- принимает DOM-элемент главной страницы, в котором размещаются карточки и брокер событий.
+- `constructor(protected container: HTMLElement, protected events: IEvents)` - принимает DOM-элемент главной страницы, в котором размещаются карточки и брокер событий.
 
 *Поля :*
-- `_container: HTMLElement` - элемент контейнера.
-- `events: IEvents` - брокер событий
+- `container: HTMLElement` - элемент контейнера.
+- `events: IEvents` - брокер событий.
+- `_basket: HTMLElement` - элемент корзины.
+- `_basketCount: HTMLElement` - элемент счетчика товаров в корзине.
+- `_gallery: HTMLElement` - элемент для отображения списка карточек товаров.
+- `_wrapper: HTMLElement` - элемент для переключения возможности прокрутки главной страницы.
 
-*Методы :* 
-- `addCard(cardElement: HTMLElement)` - для добавления карточек на страницу.
-- сеттер `container` - для полного обновления содержимого главной страницы после начальной загрузки данных сервера.
+*Сеттеры :* 
+- `gallery(elements: HTMLElement[])` - для добавления карточек на страницу.
+- `count(value: number)` - для установки количества товаров в корзине.
+- `locked(value: boolean)` - для включения и отключения прокрутки главной страницы.
 
 
 ### Слой коммуникации
 
-#### Класс AppApi
-Принимает в конструктор экземпляр класса `Api` и предоставляет методы реализующие взаимодействие с бэкэндом сервиса.
+#### Класс LarekApi
+Принимает в конструктор `constructor((cdn: string, baseUrl: string, options?: object)` - часть адреса получения изображений карточки, базовый Url и опционально объект с заголовками запросов. Предоставляет методы реализующие взаимодействие с бэкэндом сервиса.
+
+* Методы :*
+- `getProductList(): Promise<ICard[]>` - для получения списка продуктов.
+- `placeOrder(order: IOrder): Promise<TOrderResponse>` - для отправки сформированного ордера на сервер
 
 ### Взаимодействие компонентов
 Код, описывающий взаимодействие представления и данных между собой находится в файле `index.ts`, выполняющем роль презентера.\

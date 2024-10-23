@@ -1,6 +1,6 @@
 // import { ICard } from "../types";
 import { ensureElement } from "../../utils/utils";
-import { View } from "../common/View";
+import { View } from "../base/View";
 import { IEvents } from "../base/events";
 
 interface IPage {
@@ -15,8 +15,8 @@ export class PageView extends View<IPage> {
     protected _gallery: HTMLElement;
     protected _wrapper: HTMLElement;
 
-    constructor(protected container: HTMLElement, protected _events: IEvents) {
-        super(container, _events);
+    constructor(protected container: HTMLElement, protected events: IEvents) {
+        super(container, events);
 
         this._basket = container.querySelector('.header__basket');
         this._wrapper = container.querySelector('.page__wrapper');
