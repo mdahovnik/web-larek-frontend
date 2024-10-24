@@ -1,4 +1,4 @@
-import { IBasketData, ICard, TBasketCard, TGalleryCard } from "../../types";
+import { IBasketData, ICard, TBasketCard } from "../../types";
 import { IEvents } from "../base/events";
 
 export class BasketData implements IBasketData {

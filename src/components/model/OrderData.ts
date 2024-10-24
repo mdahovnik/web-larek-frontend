@@ -1,7 +1,7 @@
 import { IOrderData, IOrder, TOrderError } from "../../types";
 import { IEvents } from "../base/events";
 
-//TODO: убрать не нужные методы
+
 export class OrderData implements IOrderData {
     protected _orderErrors: TOrderError;
     protected _order: IOrder = {

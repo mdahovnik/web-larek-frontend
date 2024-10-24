@@ -1,5 +1,3 @@
-// import { ICard } from "../types";
-import { ensureElement } from "../../utils/utils";
 import { View } from "../base/View";
 import { IEvents } from "../base/events";
 

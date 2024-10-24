@@ -4,16 +4,15 @@ import { EventEmitter } from './components/base/events';
 import { CardsData } from './components/model/CardsData';
 import { LarekAPI } from './components/base/LarekAPI';
 import { CardView } from './components/view/CardView';
-import { IBasketData, ICard, IOrder, TBasketCard, TGalleryCard, TPayment } from './types';
+import { ICard, IOrder, TBasketCard, TGalleryCard, TPayment } from './types';
 import { PageView } from './components/view/PageView';
 import { cloneTemplate, ensureElement } from './utils/utils';
 import { ModalView } from './components/view/ModalView';
 import { BasketData } from './components/model/BasketData';
-import { BasketView, IBasketContent } from './components/view/BasketView';
+import { BasketView} from './components/view/BasketView';
 import { OrderData } from './components/model/OrderData';
 import { OrderView } from './components/view/OrderView';
 import { SuccessView } from './components/view/SuccessView';
-import { IOrderForm } from './components/view/ContactsView';
 
 
 const events = new EventEmitter();

@@ -47,7 +47,7 @@ export interface IOrderData {
     clear(): void;
 }
 
-//TODO: перепроверить типы
+
 export type TOrderResponse = { id: string, total: number }
 export type TPayment = 'card' | 'cash';
 export type TOrderError = Partial<Pick<IOrder, 'payment' | 'address' | 'email' | 'phone'>>

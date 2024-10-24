@@ -1,4 +1,3 @@
-import { ICard } from "../../types";
 import { CategoryColor } from "../../utils/constants";
 import { IEvents } from "../base/events";
 import { View } from "../base/View";
