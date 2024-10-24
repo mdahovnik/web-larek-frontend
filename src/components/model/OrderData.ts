@@ -16,7 +16,7 @@ export class OrderData implements IOrderData {
     }
 
     get order() {
-        return this._order;
+        return Object.freeze(this._order);
     }
 
     setField(field: keyof IOrder, value: string) {

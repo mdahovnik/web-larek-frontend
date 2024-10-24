@@ -9,7 +9,7 @@ import { Page } from './components/view/Page';
 import { cloneTemplate, ensureElement } from './utils/utils';
 import { Modal } from './components/view/Modal';
 import { BasketData } from './components/model/BasketData';
-import { Basket} from './components/view/Basket';
+import { Basket } from './components/view/Basket';
 import { OrderData } from './components/model/OrderData';
 import { OrderForm } from './components/view/OrderForm';
 import { Success } from './components/view/Success';
@@ -140,7 +140,10 @@ events.on('basket:submit', () => {
         content: orderView.render({
             payment: '',
             valid: false,
-            error: getErrorMessage({ payment, address })
+            error: getErrorMessage({
+                payment,
+                address
+            })
         })
     });
 })
@@ -162,7 +165,10 @@ events.on('order-data:change', (errors: Partial<IOrder>) => {
 
     orderView.render({
         valid: order.isOrderValid(),
-        error: getErrorMessage({ payment, address })
+        error: getErrorMessage({
+            payment,
+            address
+        })
     });
 })
 
@@ -173,7 +179,10 @@ events.on('order-form:submit', () => {
     modalView.render({
         content: contactsView.render({
             valid: false,
-            error: getErrorMessage({ email, phone })
+            error: getErrorMessage({
+                email,
+                phone
+            })
         })
     });
 })
@@ -191,7 +200,10 @@ events.on('contacts-data:change', (errors: Partial<IOrder>) => {
 
     contactsView.render({
         valid: order.isContactsValid(),
-        error: getErrorMessage({ email, phone })
+        error: getErrorMessage({
+            email,
+            phone
+        })
     });
 })
 
@@ -210,7 +222,7 @@ events.on('contacts-form:submit', () => {
                     description: `Списано ${data.total} синапсов`
                 })
             });
-
+            basket.clear();
         }).catch(err => console.error(err))
 })
 
@@ -219,7 +231,6 @@ events.on('contacts-form:submit', () => {
  * ORDER STATUS
  */
 events.on('order-success:submit', () => {
-    basket.clear();
     modalView.close();
 })
 
