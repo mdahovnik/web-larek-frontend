@@ -53,10 +53,14 @@ api.getProductList().then(data => {
  */
 events.on('cards-list:changed', () => {
     pageView.render({
-        gallery: cards.getGalleryCards().map(cardData => {
-            const newCardV = new CardView<TGalleryCard>(cloneTemplate('#card-catalog'), events);
-            return newCardV.render({
-                ...cardData
+        gallery: cards.getGalleryCards().map(item => {
+            const cardCatalog = new CardView<TGalleryCard>(cloneTemplate('#card-catalog'), events, {
+                onClick: () => {
+                    events.emit('card-preview:changed', item)
+                }
+            });
+            return cardCatalog.render({
+                ...item
             });
         })
     });
@@ -66,40 +70,50 @@ events.on('cards-list:changed', () => {
 /**
  * CARD PREVIEW
  */
-events.on('card-preview:changed', (card: { id: string }) => {
-    const cardPreview = new CardView<ICard>(cloneTemplate('#card-preview'), events);
-    const selectedCard = cards.getCard(card.id);
+events.on('card-preview:changed', (item: TGalleryCard) => {
+    const isInBasket = basket.contains(item.id);
+    const selectedCard = cards.getCard(item.id);
+    const cardPreview = new CardView<ICard>(cloneTemplate('#card-preview'), events, {
+        onClick: () => {
+            if (isInBasket)
+                events.emit('basket:remove', item);
+            else
+                events.emit('basket:add', item);
+
+            modalView.close();
+        }
+    });
 
     modalView.render({
         content: cardPreview.render({
             ...selectedCard,
-            canBuy: basket.contains(card.id)
+            canBuy: isInBasket
         })
     });
-})
-
-events.on('card-button:press', () => {
-    modalView.close();
 })
 
 
 /**
  * BASKET
  */
-events.on('basket:add', (card: { id: string }) => {
-    basket.add(cards.getCard(card.id));
+events.on('basket:add', (item: TGalleryCard) => {
+    basket.add(cards.getCard(item.id));
 })
 
-events.on('basket:remove', (card: { id: string }) => {
-    basket.remove(card.id);
+events.on('basket:remove', (item: TBasketCard) => {
+    basket.remove(item.id);
 })
 
 events.on('basket-data:change', () => {
     basketView.render({
         cost: basket.getCost(),
         cards: basket.getBasketViewCards().map((item) => {
-            const newCardView = new CardView<TBasketCard>(cloneTemplate('#card-basket'), events);
-            return newCardView.render({
+            const cardBasket = new CardView<TBasketCard>(cloneTemplate('#card-basket'), events, {
+                onClick: () => {
+                    events.emit('basket:remove', item);
+                }
+            });
+            return cardBasket.render({
                 ...item
             });
         })
@@ -146,6 +160,7 @@ events.on('order-form:input', (data: { field: keyof IOrder, value: string }) => 
 
 events.on('order-data:change', (errors: Partial<IOrder>) => {
     const { payment, address } = errors;
+
     orderView.render({
         valid: order.isOrderValid(),
         error: getErrorMessage({ payment, address })
@@ -174,6 +189,7 @@ events.on('contacts-form:input', (data: { field: keyof IOrder, value: string }) 
 
 events.on('contacts-data:change', (errors: Partial<IOrder>) => {
     const { email, phone } = errors;
+
     contactsView.render({
         valid: order.isContactsValid(),
         error: getErrorMessage({ email, phone })
@@ -196,7 +212,6 @@ events.on('contacts-form:submit', () => {
                 })
             });
 
-            basket.clear();
         }).catch(err => console.error(err))
 })
 
@@ -205,6 +220,7 @@ events.on('contacts-form:submit', () => {
  * ORDER STATUS
  */
 events.on('order-success:submit', () => {
+    basket.clear();
     modalView.close();
 })
 
@@ -225,4 +241,5 @@ function getErrorMessage(errors: Partial<IOrder>): string {
         .filter(i => !!i)
         .join(' и ');
 }
+
 

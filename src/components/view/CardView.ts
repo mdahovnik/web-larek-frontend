@@ -3,6 +3,9 @@ import { CategoryColor } from "../../utils/constants";
 import { IEvents } from "../base/events";
 import { View } from "../base/View";
 
+interface ICArdAction {
+    onClick: () => void;
+}
 
 export class CardView<T> extends View<T> {
     protected _cardCategory: HTMLSpanElement;
@@ -12,10 +15,8 @@ export class CardView<T> extends View<T> {
     protected _cardText: HTMLParagraphElement;
     protected _button: HTMLButtonElement;
     protected _index: HTMLElement;
-    protected _isSelected: boolean;
-    protected id: string;
 
-    constructor(protected container: HTMLElement, events: IEvents) {
+    constructor(protected container: HTMLElement, events: IEvents, action?: ICArdAction) {
         super(container, events);
 
         this._cardCategory = this.container.querySelector('.card__category');
@@ -28,25 +29,12 @@ export class CardView<T> extends View<T> {
 
         if (!this._button) {
             this.container.addEventListener('click', () => {
-                this.emitChanges('card-preview:changed', { id: this.id });
+                action?.onClick?.();
             });
         }
 
-        if (this._cardText) {
-            this._button.addEventListener('click', () => {
-                if (this._isSelected)
-                    this.emitChanges('basket:remove', { id: this.id });
-                else
-                    this.emitChanges('basket:add', { id: this.id });
-
-                this.emitChanges('card-button:press')
-            });
-        }
-
-        if (!this._cardCategory) {
-            this._button.addEventListener('click', () => {
-                this.emitChanges('basket:remove', { id: this.id });
-            });
+        if (this._cardText || !this._cardCategory) {
+            this._button.addEventListener('click', () => { action?.onClick?.() });
         }
     }
 
@@ -77,11 +65,8 @@ export class CardView<T> extends View<T> {
     }
 
     set canBuy(value: boolean) {
-        this._isSelected = value;
-
-        if (this._isSelected && this._cardCategory) {
+        if (value && this._cardCategory)
             this.setText(this._button, 'Удалить');
-        }
     }
 
     protected setColor(category: string): void {

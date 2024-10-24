@@ -1,6 +1,5 @@
 import { ApiPostMethods } from "../components/base/api";
 
-//TODO: добавить не достающие методы
 export interface ICard {
     id: string;
     description: string;
@@ -20,14 +19,12 @@ export interface ICardsData {
 }
 
 export interface IBasketData {
-    cards: ICard[];
     getCost(): number;
     getQuantity(): number;
     add(card: ICard): void;
     remove(id: string): void;
     getIdList(): string[];
     contains(id: string): boolean;
-    isEmpty(): boolean;
     clear(): void;
 }
 

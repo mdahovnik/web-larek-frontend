@@ -8,33 +8,6 @@ export class BasketData implements IBasketData {
         this._cards = [];
     }
 
-    set cards(cards: []) {
-        this._cards = cards;
-        this.basketDataChanged();
-    }
-
-    getBasketViewCards(): TBasketCard[] {
-        return this._cards.map((item, index) => {
-            return {
-                id: item.id,
-                title: item.title,
-                price: item.price,
-                index: index + 1
-            }
-        })
-    }
-
-    getCost() {
-        if (!this._cards.length) return 0;
-        return this._cards
-            .map((item) => item.price)
-            .reduce((a, b) => a + b);
-    }
-
-    getQuantity() {
-        return this._cards.length ?? 0;
-    }
-
     add(card: ICard): void {
         if (!this.contains(card.id)) {
             this._cards.unshift(card);
@@ -49,24 +22,42 @@ export class BasketData implements IBasketData {
         }
     }
 
-    clear() {
+    getBasketViewCards(): TBasketCard[] {
+        return this._cards.map((item, index) => {
+            return {
+                id: item.id,
+                title: item.title,
+                price: item.price,
+                index: index + 1
+            }
+        })
+    }
+
+    getCost(): number {
+        if (!this._cards.length) return 0;
+        return this._cards
+            .map((item) => item.price)
+            .reduce((a, b) => a + b);
+    }
+
+    getQuantity(): number {
+        return this._cards.length ?? 0;
+    }
+
+    clear(): void {
         this._cards = [];
         this.basketDataChanged();
     }
 
-    getIdList() {
+    getIdList(): string[] {
         return this._cards.map(card => card.id);
     }
 
-    contains(id: string) {
+    contains(id: string): boolean {
         return this._cards.some(item => item.id === id);
     }
 
-    isEmpty(): boolean {
-        return this._cards.length === 0;
-    }
-
-    protected basketDataChanged() {
+    protected basketDataChanged(): void {
         this.events.emit('basket-data:change', { data: this })
     }
 

@@ -5,8 +5,7 @@ export class CardsData implements ICardsData {
     protected _list: ICard[];
     protected _selectedCard: string;
 
-    constructor(protected events: IEvents) {
-    }
+    constructor(protected events: IEvents) {}
 
     set list(cards: ICard[]) {
         this._list = cards;
@@ -37,9 +36,5 @@ export class CardsData implements ICardsData {
             }
         })
     }
-
-    // setCardBasketStatus(id: string, value: boolean) {
-    //     this.getCard(id).isInBasket = value;
-    // }
 
 }
