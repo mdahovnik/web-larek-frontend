@@ -11,9 +11,9 @@ export class Form<T> extends View<T> {
     constructor(protected container: HTMLElement, protected events: IEvents) {
         super(container, events);
 
-        this._submitButton = this.container.querySelector('button[type=submit]');
-        this._containerName = this.container.getAttribute('name');
-        this._error = this.container.querySelector('.form__errors');
+        this._submitButton = container.querySelector('button[type=submit]');
+        this._error = container.querySelector('.form__errors');
+        this._containerName = container.getAttribute('name');
 
         this.container.addEventListener('input', (event) => {
             const input = (event.target as HTMLInputElement);

@@ -1,3 +1,4 @@
+import { ensureElement } from "../../utils/utils";
 import { View } from "../base/View";
 import { IEvents } from "../base/events";
 
@@ -6,19 +7,19 @@ export interface IBasketContent {
     cost: number;
 }
 
-export class BasketView extends View<IBasketContent> {
+export class Basket extends View<IBasketContent> {
     protected _cards: HTMLUListElement;
-    protected _basketItemIndex: HTMLElement;
+    protected _basketItemIndex: HTMLSpanElement;
     protected _basketButton: HTMLButtonElement;
     protected _cost: HTMLElement;
 
     constructor(protected container: HTMLElement, protected events: IEvents) {
         super(container, events);
 
-        this._cards = container.querySelector('.basket__list');
+        this._cards = ensureElement<HTMLUListElement>('.basket__list', container);
+        this._basketButton = ensureElement<HTMLButtonElement>('.basket__button', container);
+        this._cost = ensureElement('.basket__price', container);
         this._basketItemIndex = container.querySelector('.basket__item-index');
-        this._basketButton = container.querySelector('.basket__button');
-        this._cost = container.querySelector('.basket__price');
 
         this._basketButton.addEventListener('click', () => {
             this.emitChanges('basket:submit')

@@ -8,11 +8,8 @@ export interface ILarekAPI {
 }
 
 export class LarekAPI extends Api implements ILarekAPI {
-    private _cdn: string;
-
-    constructor(cdn: string, baseUrl: string, option?: object) {
+    constructor(protected cdn: string, baseUrl: string, option?: object) {
         super(baseUrl, option)
-        this._cdn = cdn;
     }
 
     getProductList(): Promise<ICard[]> {
@@ -20,7 +17,7 @@ export class LarekAPI extends Api implements ILarekAPI {
             .then((data: TInitCards) =>
                 data.items.map(item => ({
                     ...item,
-                    image: this._cdn + item.image
+                    image: this.cdn + item.image
                 }))
             );
     }

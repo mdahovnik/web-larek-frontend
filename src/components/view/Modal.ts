@@ -1,3 +1,4 @@
+import { ensureElement } from "../../utils/utils";
 import { View } from "../base/View";
 import { IEvents } from "../base/events";
 
@@ -6,15 +7,15 @@ interface IModalContent {
     cost: number;
 }
 
-export class ModalView extends View<IModalContent> {
+export class Modal extends View<IModalContent> {
     protected _closeBtn: HTMLButtonElement;
     protected _content: HTMLElement;
 
     constructor(protected container: HTMLElement, protected events: IEvents) {
         super(container, events);
 
-        this._closeBtn = container.querySelector('.modal__close');
-        this._content = container.querySelector('.modal__content');
+        this._content = ensureElement('.modal__content', container);
+        this._closeBtn = ensureElement<HTMLButtonElement>('.modal__close', container);
 
         this._closeBtn.addEventListener('click', this.close.bind(this));
         this.container.addEventListener('click', this.close.bind(this));

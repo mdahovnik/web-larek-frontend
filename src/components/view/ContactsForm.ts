@@ -10,7 +10,7 @@ export interface IOrderForm {
     valid: boolean;
 }
 
-export class ContactsView extends Form<IOrderForm> {
+export class ContactsForm extends Form<IOrderForm> {
  
     constructor(protected container: HTMLFormElement, protected events: IEvents) {
         super(container, events);

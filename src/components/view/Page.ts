@@ -1,3 +1,4 @@
+import { ensureElement } from "../../utils/utils";
 import { View } from "../base/View";
 import { IEvents } from "../base/events";
 
@@ -7,21 +8,21 @@ interface IPage {
     locked: boolean;
 }
 
-export class PageView extends View<IPage> {
-    protected _basket: HTMLElement;
+export class Page extends View<IPage> {
+    protected _basketButton: HTMLElement;
     protected _basketCount: HTMLElement;
+    protected _pageWrapper: HTMLElement;
     protected _gallery: HTMLElement;
-    protected _wrapper: HTMLElement;
 
     constructor(protected container: HTMLElement, protected events: IEvents) {
         super(container, events);
 
-        this._basket = container.querySelector('.header__basket');
-        this._wrapper = container.querySelector('.page__wrapper');
+        this._basketButton = ensureElement('.header__basket', container);
+        this._pageWrapper = ensureElement('.page__wrapper', container);
+        this._gallery = ensureElement('.gallery', container);
         this._basketCount = container.querySelector('.header__basket-counter');
-        this._gallery = container.querySelector('.gallery');
 
-        this._basket.addEventListener('click', () => {
+        this._basketButton.addEventListener('click', () => {
             this.emitChanges('basket:open', { data: this });
         });
     }
@@ -35,7 +36,7 @@ export class PageView extends View<IPage> {
     }
 
     set locked(value: boolean) {
-        this.toggleClass(this._wrapper, 'page__wrapper_locked', value);
+        this.toggleClass(this._pageWrapper, 'page__wrapper_locked', value);
     }
 
 }

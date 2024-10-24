@@ -1,5 +1,3 @@
-import { ApiPostMethods } from "../components/base/api";
-
 export interface ICard {
     id: string;
     description: string;

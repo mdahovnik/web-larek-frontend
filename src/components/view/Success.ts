@@ -7,12 +7,13 @@ export interface IOrderSuccess {
     description: string;
 }
 
-export class SuccessView extends View<IOrderSuccess> {
+export class Success extends View<IOrderSuccess> {
     protected _description: HTMLElement;
     protected _successButton: HTMLButtonElement;
 
     constructor(protected container: HTMLElement, protected events: IEvents) {
         super(container, events);
+        
         this._description = container.querySelector('.order-success__description');
         this._successButton = container.querySelector('.order-success__close');
 

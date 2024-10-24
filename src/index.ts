@@ -3,16 +3,16 @@ import { API_URL, CDN_URL, settings } from "./utils/constants";
 import { EventEmitter } from './components/base/events';
 import { CardsData } from './components/model/CardsData';
 import { LarekAPI } from './components/base/LarekAPI';
-import { CardView } from './components/view/CardView';
+import { Card } from './components/view/Card';
 import { ICard, IOrder, TBasketCard, TGalleryCard, TPayment } from './types';
-import { PageView } from './components/view/PageView';
+import { Page } from './components/view/Page';
 import { cloneTemplate, ensureElement } from './utils/utils';
-import { ModalView } from './components/view/ModalView';
+import { Modal } from './components/view/Modal';
 import { BasketData } from './components/model/BasketData';
-import { BasketView} from './components/view/BasketView';
+import { Basket} from './components/view/Basket';
 import { OrderData } from './components/model/OrderData';
-import { OrderView } from './components/view/OrderView';
-import { SuccessView } from './components/view/SuccessView';
+import { OrderForm } from './components/view/OrderForm';
+import { Success } from './components/view/Success';
 
 
 const events = new EventEmitter();
@@ -27,13 +27,13 @@ const cards = new CardsData(events);
 const basket = new BasketData(events);
 const order = new OrderData(events);
 
-const pageView = new PageView(ensureElement('.page'), events);
-const modalView = new ModalView(ensureElement<HTMLElement>('#modal-container'), events);
+const pageView = new Page(ensureElement('.page'), events);
+const modalView = new Modal(ensureElement<HTMLElement>('#modal-container'), events);
 
-const basketView = new BasketView(cloneTemplate(basketTemplate), events);
-const orderView = new OrderView(cloneTemplate(orderTemplate), events);
-const contactsView = new OrderView(cloneTemplate(contactsTemplate), events);
-const successView = new SuccessView(cloneTemplate(successTemplate), events);
+const basketView = new Basket(cloneTemplate(basketTemplate), events);
+const orderView = new OrderForm(cloneTemplate(orderTemplate), events);
+const contactsView = new OrderForm(cloneTemplate(contactsTemplate), events);
+const successView = new Success(cloneTemplate(successTemplate), events);
 
 events.onAll((event) => {
     console.log(event.eventName, event.data);
@@ -53,7 +53,7 @@ api.getProductList().then(data => {
 events.on('cards-list:changed', () => {
     pageView.render({
         gallery: cards.getGalleryCards().map(item => {
-            const cardCatalog = new CardView<TGalleryCard>(cloneTemplate('#card-catalog'), events, {
+            const cardCatalog = new Card<TGalleryCard>(cloneTemplate('#card-catalog'), events, {
                 onClick: () => {
                     events.emit('card-preview:changed', item)
                 }
@@ -72,7 +72,7 @@ events.on('cards-list:changed', () => {
 events.on('card-preview:changed', (item: TGalleryCard) => {
     const isInBasket = basket.contains(item.id);
     const selectedCard = cards.getCard(item.id);
-    const cardPreview = new CardView<ICard>(cloneTemplate('#card-preview'), events, {
+    const cardPreview = new Card<ICard>(cloneTemplate('#card-preview'), events, {
         onClick: () => {
             if (isInBasket)
                 events.emit('basket:remove', item);
@@ -107,7 +107,7 @@ events.on('basket-data:change', () => {
     basketView.render({
         cost: basket.getCost(),
         cards: basket.getBasketViewCards().map((item) => {
-            const cardBasket = new CardView<TBasketCard>(cloneTemplate('#card-basket'), events, {
+            const cardBasket = new Card<TBasketCard>(cloneTemplate('#card-basket'), events, {
                 onClick: () => {
                     events.emit('basket:remove', item);
                 }

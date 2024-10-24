@@ -1,17 +1,17 @@
-import { isEmpty } from "../../utils/utils";
+import { ensureAllElements, isEmpty } from "../../utils/utils";
 import { IEvents } from "../base/events";
 import { Form } from "../common/Form";
-import { IOrderForm } from "./ContactsView";
+import { IOrderForm } from "./ContactsForm";
 
 
-export class OrderView extends Form<IOrderForm> {
-    protected _orderButtons?: NodeListOf<HTMLButtonElement>;
+export class OrderForm extends Form<IOrderForm> {
+    protected _orderButtons: HTMLButtonElement[];
     protected _payment: string;
 
     constructor(protected container: HTMLFormElement, protected events: IEvents) {
         super(container, events);
 
-        this._orderButtons = this.container.querySelectorAll('button[type=button]');
+        this._orderButtons = ensureAllElements<HTMLButtonElement>('button[type=button]', container);
 
         this._orderButtons?.forEach(button => {
             button.addEventListener('click', () => {

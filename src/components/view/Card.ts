@@ -1,4 +1,5 @@
 import { CategoryColor } from "../../utils/constants";
+import { ensureElement } from "../../utils/utils";
 import { IEvents } from "../base/events";
 import { View } from "../base/View";
 
@@ -6,7 +7,7 @@ interface ICArdAction {
     onClick: () => void;
 }
 
-export class CardView<T> extends View<T> {
+export class Card<T> extends View<T> {
     protected _cardCategory: HTMLSpanElement;
     protected _cardTitle: HTMLTitleElement;
     protected _cardImage: HTMLImageElement;
@@ -18,13 +19,13 @@ export class CardView<T> extends View<T> {
     constructor(protected container: HTMLElement, events: IEvents, action?: ICArdAction) {
         super(container, events);
 
-        this._cardCategory = this.container.querySelector('.card__category');
-        this._cardTitle = this.container.querySelector('.card__title');
-        this._cardImage = this.container.querySelector('.card__image');
-        this._cardPrice = this.container.querySelector('.card__price');
-        this._cardText = this.container.querySelector('.card__text');
-        this._button = this.container.querySelector('.card__button');
-        this._index = this.container.querySelector('.basket__item-index');
+        this._cardTitle = ensureElement<HTMLTitleElement>('.card__title', container);
+        this._cardPrice = ensureElement('.card__price', container);
+        this._cardImage = container.querySelector('.card__image');
+        this._index = container.querySelector('.basket__item-index');
+        this._cardText = container.querySelector('.card__text');
+        this._cardCategory = container.querySelector('.card__category');
+        this._button = container.querySelector('.card__button');
 
         if (!this._button) {
             this.container.addEventListener('click', () => {
