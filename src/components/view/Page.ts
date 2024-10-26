@@ -1,3 +1,4 @@
+import { appEvents } from "../../utils/constants";
 import { ensureElement } from "../../utils/utils";
 import { View } from "../base/View";
 import { IEvents } from "../base/events";
@@ -23,7 +24,7 @@ export class Page extends View<IPage> {
         this._basketCount = container.querySelector('.header__basket-counter');
 
         this._basketButton.addEventListener('click', () => {
-            this.emitChanges('basket:open', { data: this });
+            this.emitChanges(appEvents.basketOpen, { data: this });
         });
     }
 

@@ -1,9 +1,9 @@
 import { IEvents } from "./events";
 
 export abstract class View<T> {
-    constructor(protected readonly container: HTMLElement, protected events: IEvents) {}
+    constructor(protected readonly container: HTMLElement, protected events: IEvents) { }
 
-    emitChanges(event: string, payload?: object) {
+    protected emitChanges(event: string, payload?: object) {
         this.events.emit(event, payload ?? {});
     }
 
@@ -13,7 +13,7 @@ export abstract class View<T> {
         }
     }
 
-    setDisabled(element: HTMLElement, state: boolean) {
+    protected setDisabled(element: HTMLElement, state: boolean) {
         if (element) {
             if (state) element.setAttribute('disabled', 'disabled');
             else element.removeAttribute('disabled');
@@ -29,7 +29,7 @@ export abstract class View<T> {
         }
     }
 
-    toggleClass(element: HTMLElement, className: string, force?: boolean) {
+    protected toggleClass(element: HTMLElement, className: string, force?: boolean) {
         element.classList.toggle(className, force);
     }
 

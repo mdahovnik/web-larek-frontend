@@ -1,4 +1,5 @@
 import { IOrderData, IOrder, TOrderError } from "../../types";
+import { appEvents } from "../../utils/constants";
 import { IEvents } from "../base/events";
 
 
@@ -25,9 +26,9 @@ export class OrderData implements IOrderData {
         this.validateOrder();
 
         if (field === 'payment' || field === 'address')
-            this.eventsEmit('order-data:change');
+            this.eventsEmit(appEvents.orderDataChange);
         else
-            this.eventsEmit('contacts-data:change');
+            this.eventsEmit(appEvents.contactsDataChange);
     }
 
     clear() {

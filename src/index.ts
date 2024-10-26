@@ -1,5 +1,5 @@
 import './scss/styles.scss';
-import { API_URL, CDN_URL, settings } from "./utils/constants";
+import { API_URL, appEvents, CDN_URL, settings } from "./utils/constants";
 import { EventEmitter } from './components/base/events';
 import { CardsData } from './components/model/CardsData';
 import { LarekAPI } from './components/base/LarekAPI';
@@ -39,23 +39,24 @@ events.onAll((event) => {
     console.log(event.eventName, event.data);
 });
 
+
 /**
  * INITIAL LOAD
  */
 api.getProductList().then(data => {
     cards.list = data;
-}).catch(err => console.error(err))
+}).catch(console.error)
 
 
 /**
  * GALLERY
  */
-events.on('cards-list:changed', () => {
+events.on(appEvents.cardsListChanged, () => {
     pageView.render({
         gallery: cards.getGalleryCards().map(item => {
             const cardCatalog = new Card<TGalleryCard>(cloneTemplate('#card-catalog'), events, {
                 onClick: () => {
-                    events.emit('card-preview:changed', item)
+                    events.emit(appEvents.cardPreviewChanged, item)
                 }
             });
             return cardCatalog.render({
@@ -69,15 +70,15 @@ events.on('cards-list:changed', () => {
 /**
  * CARD PREVIEW
  */
-events.on('card-preview:changed', (item: TGalleryCard) => {
+events.on(appEvents.cardPreviewChanged, (item: TGalleryCard) => {
     const isInBasket = basket.contains(item.id);
     const selectedCard = cards.getCard(item.id);
     const cardPreview = new Card<ICard>(cloneTemplate('#card-preview'), events, {
         onClick: () => {
             if (isInBasket)
-                events.emit('basket:remove', item);
+                events.emit(appEvents.basketRemove, item);
             else
-                events.emit('basket:add', item);
+                events.emit(appEvents.basketAdd, item);
 
             modalView.close();
         }
@@ -95,21 +96,21 @@ events.on('card-preview:changed', (item: TGalleryCard) => {
 /**
  * BASKET
  */
-events.on('basket:add', (item: TGalleryCard) => {
+events.on(appEvents.basketAdd, (item: TGalleryCard) => {
     basket.add(cards.getCard(item.id));
 })
 
-events.on('basket:remove', (item: TBasketCard) => {
+events.on(appEvents.basketRemove, (item: TBasketCard) => {
     basket.remove(item.id);
 })
 
-events.on('basket-data:change', () => {
+events.on(appEvents.basketDataChange, () => {
     basketView.render({
         cost: basket.getCost(),
         cards: basket.getBasketViewCards().map((item) => {
             const cardBasket = new Card<TBasketCard>(cloneTemplate('#card-basket'), events, {
                 onClick: () => {
-                    events.emit('basket:remove', item);
+                    events.emit(appEvents.basketRemove, item);
                 }
             });
             return cardBasket.render({
@@ -123,7 +124,7 @@ events.on('basket-data:change', () => {
     });
 })
 
-events.on('basket:open', () => {
+events.on(appEvents.basketOpen, () => {
     modalView.render({
         content: basketView.render({
             cost: basket.getCost()
@@ -131,7 +132,7 @@ events.on('basket:open', () => {
     });
 })
 
-events.on('basket:submit', () => {
+events.on(appEvents.basketSubmit, () => {
     order.clear();
     orderView.reset();
     const { payment, address } = order.getOrderError();
@@ -152,15 +153,15 @@ events.on('basket:submit', () => {
 /**
  * ORDER FORM
  */
-events.on('order-payment:select', (data: { payment: TPayment }) => {
+events.on(appEvents.orderPaymentSelect, (data: { payment: TPayment }) => {
     order.setField('payment', data.payment);
 })
 
-events.on('order-form:input', (data: { field: keyof IOrder, value: string }) => {
+events.on(appEvents.orderFormInput, (data: { field: keyof IOrder, value: string }) => {
     order.setField(data.field, data.value);
 })
 
-events.on('order-data:change', (errors: Partial<IOrder>) => {
+events.on(appEvents.orderDataChange, (errors: Partial<IOrder>) => {
     const { payment, address } = errors;
 
     orderView.render({
@@ -172,7 +173,7 @@ events.on('order-data:change', (errors: Partial<IOrder>) => {
     });
 })
 
-events.on('order-form:submit', () => {
+events.on(appEvents.orderFormSubmit, () => {
     contactsView.reset();
     const { email, phone } = order.getOrderError();
 
@@ -191,11 +192,11 @@ events.on('order-form:submit', () => {
 /**
  * CONTACTS FORM
  */
-events.on('contacts-form:input', (data: { field: keyof IOrder, value: string }) => {
+events.on(appEvents.contactsFormInput, (data: { field: keyof IOrder, value: string }) => {
     order.setField(data.field, data.value)
 })
-
-events.on('contacts-data:change', (errors: Partial<IOrder>) => {
+                            
+events.on(appEvents.contactsDataChange, (errors: Partial<IOrder>) => {
     const { email, phone } = errors;
 
     contactsView.render({
@@ -207,7 +208,7 @@ events.on('contacts-data:change', (errors: Partial<IOrder>) => {
     });
 })
 
-events.on('contacts-form:submit', () => {
+events.on(appEvents.contactsFormSubmit, () => {
     const orderData = Object.assign(
         { ...order.order },
         {
@@ -223,14 +224,14 @@ events.on('contacts-form:submit', () => {
                 })
             });
             basket.clear();
-        }).catch(err => console.error(err))
+        }).catch(console.error)
 })
 
 
 /**
  * ORDER STATUS
  */
-events.on('order-success:submit', () => {
+events.on(appEvents.orderSuccessSubmit, () => {
     modalView.close();
 })
 
@@ -238,11 +239,11 @@ events.on('order-success:submit', () => {
 /**
  * MODAL
  */
-events.on('modal:open', () => {
+events.on(appEvents.modalOpen, () => {
     pageView.locked = true;
 });
 
-events.on('modal:close', () => {
+events.on(appEvents.modalClose, () => {
     pageView.locked = false;
 });
 

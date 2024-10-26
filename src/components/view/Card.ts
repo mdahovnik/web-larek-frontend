@@ -28,9 +28,7 @@ export class Card<T> extends View<T> {
         this._button = container.querySelector('.card__button');
 
         if (!this._button) {
-            this.container.addEventListener('click', () => {
-                action?.onClick?.();
-            });
+            this.container.addEventListener('click', () => { action?.onClick?.() });
         }
 
         if (this._cardText || !this._cardCategory) {
@@ -75,7 +73,7 @@ export class Card<T> extends View<T> {
                 return CategoryColor[key] === category
             });
 
-        this._cardCategory.classList.add(`card__category_${color}`);
+        this.toggleClass(this._cardCategory, `card__category_${color}`, true);
     }
 
 }

@@ -1,4 +1,5 @@
 import { ICard, ICardsData, TGalleryCard } from "../../types";
+import { appEvents } from "../../utils/constants";
 import { IEvents } from "../base/events";
 
 export class CardsData implements ICardsData {
@@ -9,12 +10,12 @@ export class CardsData implements ICardsData {
 
     set list(cards: ICard[]) {
         this._list = cards;
-        this.events.emit('cards-list:changed');
+        this.events.emit(appEvents.cardsListChanged);
     }
 
     set selectedCard(id: string) {
         this._selectedCard = id;
-        this.events.emit('selected-card:changed');
+        this.events.emit(appEvents.selectedCardChanged);
     }
 
     get selectedCard() {

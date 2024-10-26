@@ -1,3 +1,4 @@
+import { appEvents } from "../../utils/constants";
 import { ensureAllElements, isEmpty } from "../../utils/utils";
 import { IEvents } from "../base/events";
 import { Form } from "../common/Form";
@@ -20,7 +21,7 @@ export class OrderForm extends Form<IOrderForm> {
                     this.toggleClass(button, 'button_alt-active', button.name === this._payment);
                 });
 
-                this.emitChanges('order-payment:select', { payment: this._payment });
+                this.emitChanges(appEvents.orderPaymentSelect, { payment: this._payment });
             })
         })
     }
@@ -30,7 +31,7 @@ export class OrderForm extends Form<IOrderForm> {
 
         if (isEmpty(value))
             this._orderButtons.forEach(button => {
-                button.classList.remove('button_alt-active')
+                this.toggleClass(button, 'button_alt-active', false)
             });
     }
 

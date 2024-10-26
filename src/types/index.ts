@@ -46,10 +46,20 @@ export interface IOrderData {
 }
 
 
-export type TOrderResponse = { id: string, total: number }
 export type TPayment = 'card' | 'cash';
+
 export type TOrderError = Partial<Pick<IOrder, 'payment' | 'address' | 'email' | 'phone'>>
-export type TInitCards = { total: number, items: ICard[] };
+
 export type TGalleryCard = Pick<ICard, 'image' | 'title' | 'category' | 'price' | 'id'>;
+
 export type TBasketCard = Pick<ICard, 'title' | 'price' | 'id' | 'index'>;
 
+export type TOrderResponse = {
+    id: string,
+    total: number
+}
+
+export type TInitCards = {
+    total: number,
+    items: ICard[]
+};

@@ -1,4 +1,5 @@
 import { IBasketData, ICard, TBasketCard } from "../../types";
+import { appEvents } from "../../utils/constants";
 import { IEvents } from "../base/events";
 
 export class BasketData implements IBasketData {
@@ -58,7 +59,7 @@ export class BasketData implements IBasketData {
     }
 
     protected basketDataChanged(): void {
-        this.events.emit('basket-data:change', { data: this })
+        this.events.emit(appEvents.basketDataChange, { data: this })
     }
 
 }
