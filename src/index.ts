@@ -167,7 +167,7 @@ events.on(appEvents.orderDataChange, (errors: Partial<IOrder>) => {
     orderView.render({
         valid: order.isOrderValid(),
         error: getErrorMessage({
-            payment,
+            payment,    
             address
         })
     });

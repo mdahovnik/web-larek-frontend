@@ -37,5 +37,4 @@ export class CardsData implements ICardsData {
             }
         })
     }
-
 }
