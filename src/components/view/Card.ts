@@ -27,13 +27,7 @@ export class Card<T> extends View<T> {
         this._cardCategory = container.querySelector('.card__category');
         this._button = container.querySelector('.card__button');
 
-        if (!this._button) {
-            this.container.addEventListener('click', () => { action?.onClick?.() });
-        }
-
-        if (this._cardText || !this._cardCategory) {
-            this._button.addEventListener('click', () => { action?.onClick?.() });
-        }
+        this.container.addEventListener('click', () => { action?.onClick?.() });
     }
 
     set category(category: string) {
@@ -46,7 +40,8 @@ export class Card<T> extends View<T> {
     }
 
     set image(address: string) {
-        this.setImage(this._cardImage, address);
+        if (this._cardImage)
+            this.setImage(this._cardImage, address);
     }
 
     set price(price: number) {

@@ -23,9 +23,9 @@ const contactsTemplate = ensureElement<HTMLTemplateElement>('#contacts');
 const orderTemplate = ensureElement<HTMLTemplateElement>('#order');
 const successTemplate = ensureElement<HTMLTemplateElement>('#success');
 
-const cards = new CardsData(events);
-const basket = new BasketData(events);
-const order = new OrderData(events);
+const cards = new CardsData({}, events);
+const basket = new BasketData({}, events);
+const order = new OrderData({}, events);
 
 const pageView = new Page(ensureElement('.page'), events);
 const modalView = new Modal(ensureElement<HTMLElement>('#modal-container'), events);
@@ -44,7 +44,7 @@ events.onAll((event) => {
  * INITIAL LOAD
  */
 api.getProductList().then(data => {
-    cards.list = data;
+    cards.setList(data);
 }).catch(console.error)
 
 
@@ -54,12 +54,12 @@ api.getProductList().then(data => {
 events.on(appEvents.cardsListChanged, () => {
     pageView.render({
         gallery: cards.getGalleryCards().map(item => {
-            const cardCatalog = new Card<TGalleryCard>(cloneTemplate('#card-catalog'), events, {
+            const cardCatalogType = new Card<TGalleryCard>(cloneTemplate('#card-catalog'), events, {
                 onClick: () => {
                     events.emit(appEvents.cardPreviewChanged, item)
                 }
             });
-            return cardCatalog.render({
+            return cardCatalogType.render({
                 ...item
             });
         })
@@ -72,8 +72,8 @@ events.on(appEvents.cardsListChanged, () => {
  */
 events.on(appEvents.cardPreviewChanged, (item: TGalleryCard) => {
     const isInBasket = basket.contains(item.id);
-    const selectedCard = cards.getCard(item.id);
-    const cardPreview = new Card<ICard>(cloneTemplate('#card-preview'), events, {
+    cards.setSelectedCard(item.id);
+    const cardPreviewType = new Card<ICard>(cloneTemplate('#card-preview'), events, {
         onClick: () => {
             if (isInBasket)
                 events.emit(appEvents.basketRemove, item);
@@ -85,8 +85,8 @@ events.on(appEvents.cardPreviewChanged, (item: TGalleryCard) => {
     });
 
     modalView.render({
-        content: cardPreview.render({
-            ...selectedCard,
+        content: cardPreviewType.render({
+            ...cards.getSelectedCard(),
             canBuy: isInBasket
         })
     });
@@ -108,12 +108,12 @@ events.on(appEvents.basketDataChange, () => {
     basketView.render({
         cost: basket.getCost(),
         cards: basket.getBasketViewCards().map((item) => {
-            const cardBasket = new Card<TBasketCard>(cloneTemplate('#card-basket'), events, {
+            const cardBasketType = new Card<TBasketCard>(cloneTemplate('#card-basket'), events, {
                 onClick: () => {
                     events.emit(appEvents.basketRemove, item);
                 }
             });
-            return cardBasket.render({
+            return cardBasketType.render({
                 ...item
             });
         })
@@ -167,7 +167,7 @@ events.on(appEvents.orderDataChange, (errors: Partial<IOrder>) => {
     orderView.render({
         valid: order.isOrderValid(),
         error: getErrorMessage({
-            payment,    
+            payment,
             address
         })
     });
@@ -195,7 +195,7 @@ events.on(appEvents.orderFormSubmit, () => {
 events.on(appEvents.contactsFormInput, (data: { field: keyof IOrder, value: string }) => {
     order.setField(data.field, data.value)
 })
-                            
+
 events.on(appEvents.contactsDataChange, (errors: Partial<IOrder>) => {
     const { email, phone } = errors;
 
@@ -210,7 +210,7 @@ events.on(appEvents.contactsDataChange, (errors: Partial<IOrder>) => {
 
 events.on(appEvents.contactsFormSubmit, () => {
     const orderData = Object.assign(
-        { ...order.order },
+        { ...order.getOrder() },
         {
             total: basket.getCost(),
             items: basket.getIdList()

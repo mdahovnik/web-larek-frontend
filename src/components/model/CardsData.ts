@@ -1,29 +1,27 @@
 import { ICard, ICardsData, TGalleryCard } from "../../types";
 import { appEvents } from "../../utils/constants";
-import { IEvents } from "../base/events";
+import { Data } from "../base/Data";
 
-export class CardsData implements ICardsData {
-    protected _list: ICard[];
-    protected _selectedCard: string;
+export class CardsData extends Data<ICardsData> {
+    protected _list: ICard[] = [];
+    protected _selectedCardId: string = '';
 
-    constructor(protected events: IEvents) {}
-
-    set list(cards: ICard[]) {
+    setList(cards: ICard[]) {
         this._list = cards;
-        this.events.emit(appEvents.cardsListChanged);
+        this.dataChanged(appEvents.cardsListChanged);
     }
 
-    set selectedCard(id: string) {
-        this._selectedCard = id;
-        this.events.emit(appEvents.selectedCardChanged);
+    setSelectedCard(id: string) {
+        this._selectedCardId = id;
+        this.dataChanged(appEvents.selectedCardChanged);
     }
 
-    get selectedCard() {
-        return this._selectedCard;
+    getSelectedCard() {
+        return this._list.find(card => card.id === this._selectedCardId)!;
     }
 
-    getCard(id: string): ICard {
-        return this._list.find(card => card.id === id);
+    getCard(id: string) {
+        return this._list.find(card => card.id === id)!;
     }
 
     getGalleryCards(): TGalleryCard[] {

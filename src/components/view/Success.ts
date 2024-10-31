@@ -14,8 +14,8 @@ export class Success extends View<IOrderSuccess> {
     constructor(protected container: HTMLElement, protected events: IEvents) {
         super(container, events);
         
-        this._description = container.querySelector('.order-success__description');
-        this._successButton = container.querySelector('.order-success__close');
+        this._description = container.querySelector('.order-success__description')!;
+        this._successButton = container.querySelector('.order-success__close')!;
 
         this._successButton?.addEventListener('click', () => {
             this.emitChanges(`${this.container.className}:submit`);

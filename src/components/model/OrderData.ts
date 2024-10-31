@@ -1,10 +1,9 @@
 import { IOrderData, IOrder, TOrderError } from "../../types";
 import { appEvents } from "../../utils/constants";
-import { IEvents } from "../base/events";
+import { Data } from "../base/Data";
 
-
-export class OrderData implements IOrderData {
-    protected _orderErrors: TOrderError;
+export class OrderData extends Data<IOrderData> {
+    protected _orderErrors: TOrderError = {};
     protected _order: IOrder = {
         payment: '',
         email: '',
@@ -12,11 +11,7 @@ export class OrderData implements IOrderData {
         address: ''
     }
 
-    constructor(protected events: IEvents) {
-        this._orderErrors = {};
-    }
-
-    get order() {
+    getOrder() {
         const order = { ...this._order }
         return Object.freeze(order);
     }
@@ -26,9 +21,9 @@ export class OrderData implements IOrderData {
         this.validateOrder();
 
         if (field === 'payment' || field === 'address')
-            this.eventsEmit(appEvents.orderDataChange);
+            this.dataChanged(appEvents.orderDataChange, this._orderErrors);
         else
-            this.eventsEmit(appEvents.contactsDataChange);
+            this.dataChanged(appEvents.contactsDataChange, this._orderErrors);
     }
 
     clear() {
@@ -63,7 +58,4 @@ export class OrderData implements IOrderData {
         this._orderErrors = errors;
     }
 
-    protected eventsEmit(eventName: string) {
-        this.events.emit(eventName, this._orderErrors)
-    }
 }
