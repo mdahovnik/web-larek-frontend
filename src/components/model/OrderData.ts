@@ -19,11 +19,7 @@ export class OrderData extends Data<IOrderData> {
     setField(field: keyof IOrder, value: string) {
         this._order[field] = value;
         this.validateOrder();
-
-        if (field === 'payment' || field === 'address')
-            this.dataChanged(appEvents.orderDataChange, this._orderErrors);
-        else
-            this.dataChanged(appEvents.contactsDataChange, this._orderErrors);
+        this.dataChanged(appEvents.orderDataChange, this._orderErrors);
     }
 
     clear() {
@@ -31,6 +27,7 @@ export class OrderData extends Data<IOrderData> {
             .forEach(key => { this._order[key] = '' });
 
         this.validateOrder();
+        this.dataChanged(appEvents.orderDataChange);
     }
 
     getOrderError(): TOrderError {
@@ -57,5 +54,4 @@ export class OrderData extends Data<IOrderData> {
 
         this._orderErrors = errors;
     }
-
 }

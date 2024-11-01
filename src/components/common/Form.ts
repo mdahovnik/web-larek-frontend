@@ -3,8 +3,7 @@ import { View } from "../base/View";
 
 
 export class Form<T> extends View<T> {
-    protected _error: HTMLElement;
-    protected _valid: boolean;
+    protected _errorText: HTMLElement;
     protected _submitButton: HTMLButtonElement;
     protected _containerName: string;
 
@@ -12,7 +11,7 @@ export class Form<T> extends View<T> {
         super(container, events);
 
         this._submitButton = container.querySelector('button[type=submit]');
-        this._error = container.querySelector('.form__errors');
+        this._errorText = container.querySelector('.form__errors');
         this._containerName = container.getAttribute('name');
 
         this.container.addEventListener('input', (event) => {
@@ -34,19 +33,15 @@ export class Form<T> extends View<T> {
     }
 
     set valid(isValid: boolean) {
-        this._valid = isValid;
         this._submitButton.toggleAttribute('disabled', !isValid);
     }
 
     private showInputError(errorMessage: string) {
-        this.setText(this._error, 'Укажите ' + errorMessage)
+        this.setText(this._errorText, 'Укажите ' + errorMessage)
     }
 
     private hideInputError() {
-        this.setText(this._error, '')
+        this.setText(this._errorText, '')
     }
 
-    reset() {
-        (this.container as HTMLFormElement).reset();
-    }
 }

@@ -14,6 +14,7 @@ export class OrderForm extends Form<IOrderForm> {
 
         this._paymentType = '';
         this._orderButtons = ensureAllElements<HTMLButtonElement>('button[type=button]', container);
+        
         this._orderButtons?.forEach(button => {
             button.addEventListener('click', () => {
                 this._paymentType = button.name;

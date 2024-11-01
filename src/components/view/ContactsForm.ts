@@ -11,7 +11,7 @@ export interface IOrderForm {
 }
 
 export class ContactsForm extends Form<IOrderForm> {
- 
+
     constructor(protected container: HTMLFormElement, protected events: IEvents) {
         super(container, events);
     }

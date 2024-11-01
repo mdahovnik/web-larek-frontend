@@ -13,6 +13,7 @@ import { Basket } from './components/view/Basket';
 import { OrderData } from './components/model/OrderData';
 import { OrderForm } from './components/view/OrderForm';
 import { Success } from './components/view/Success';
+import { ContactsForm } from './components/view/ContactsForm';
 
 
 const events = new EventEmitter();
@@ -32,7 +33,7 @@ const modalView = new Modal(ensureElement<HTMLElement>('#modal-container'), even
 
 const basketView = new Basket(cloneTemplate(basketTemplate), events);
 const orderView = new OrderForm(cloneTemplate(orderTemplate), events);
-const contactsView = new OrderForm(cloneTemplate(contactsTemplate), events);
+const contactsView = new ContactsForm(cloneTemplate(contactsTemplate), events);
 const successView = new Success(cloneTemplate(successTemplate), events);
 
 events.onAll((event) => {
@@ -134,12 +135,12 @@ events.on(appEvents.basketOpen, () => {
 
 events.on(appEvents.basketSubmit, () => {
     order.clear();
-    orderView.reset();
     const { payment, address } = order.getOrderError();
 
     modalView.render({
         content: orderView.render({
-            payment: '',
+            payment: order.getOrder().payment,
+            address: order.getOrder().address,
             valid: false,
             error: getErrorMessage({
                 payment,
@@ -174,11 +175,12 @@ events.on(appEvents.orderDataChange, (errors: Partial<IOrder>) => {
 })
 
 events.on(appEvents.orderFormSubmit, () => {
-    contactsView.reset();
     const { email, phone } = order.getOrderError();
 
     modalView.render({
         content: contactsView.render({
+            email: order.getOrder().email,
+            phone: order.getOrder().phone,
             valid: false,
             error: getErrorMessage({
                 email,
@@ -196,7 +198,7 @@ events.on(appEvents.contactsFormInput, (data: { field: keyof IOrder, value: stri
     order.setField(data.field, data.value)
 })
 
-events.on(appEvents.contactsDataChange, (errors: Partial<IOrder>) => {
+events.on(appEvents.orderDataChange, (errors: Partial<IOrder>) => {
     const { email, phone } = errors;
 
     contactsView.render({

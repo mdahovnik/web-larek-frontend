@@ -32,5 +32,6 @@ export enum appEvents {
     orderSuccessSubmit = 'order-success:submit',
     modalOpen = 'modal:open',
     modalClose = 'modal:close',
-    selectedCardChanged = 'selected-card:changed'
+    selectedCardChanged = 'selected-card:changed',
+    errorsChanged = 'formErrors:change'
 }
