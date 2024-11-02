@@ -31,7 +31,7 @@ export class Modal extends View<IModalContent> {
         this._content.replaceChildren(content);
     }
 
-    open() {
+    protected open() {
         this.toggleClass(this.container, 'modal_active', true);
         document.addEventListener('keyup', this.handleEscUp);
         this.emitChanges(appEvents.modalOpen);

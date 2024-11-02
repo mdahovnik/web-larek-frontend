@@ -24,9 +24,9 @@ const contactsTemplate = ensureElement<HTMLTemplateElement>('#contacts');
 const orderTemplate = ensureElement<HTMLTemplateElement>('#order');
 const successTemplate = ensureElement<HTMLTemplateElement>('#success');
 
-const cards = new CardsData({}, events);
-const basket = new BasketData({}, events);
-const order = new OrderData({}, events);
+const cards = new CardsData( events);
+const basket = new BasketData( events);
+const order = new OrderData( events);
 
 const pageView = new Page(ensureElement('.page'), events);
 const modalView = new Modal(ensureElement<HTMLElement>('#modal-container'), events);
@@ -45,7 +45,7 @@ events.onAll((event) => {
  * INITIAL LOAD
  */
 api.getProductList().then(data => {
-    cards.setList(data);
+    cards.setCards(data);
 }).catch(console.error)
 
 
@@ -76,7 +76,6 @@ events.on(appEvents.cardsListChanged, () => {
  */
 events.on(appEvents.cardPreviewChanged, (item: ICard) => {
     const isInBasket = basket.contains(item.id);
-    // cards.setSelectedCard(item.id);
     const cardPreviewType = new CardPreview(cloneTemplate('#card-preview'), events, {
         onClick: () => {
             if (isInBasket)

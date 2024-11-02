@@ -10,9 +10,7 @@ export interface ICard {
 }
 
 export interface ICardsData {
-    setList(cards: ICard[]): void;
-    setSelectedCard(id: string): void;
-    getSelectedCard(): ICard;
+    setCards(cards: ICard[]): void;
     getCard(id: string): ICard;
     getCards(): ICard[];
 }
@@ -41,8 +39,6 @@ export interface IOrderData {
     getOrder(): IOrder;
     setField(field: keyof IOrder, value: string): void;
     getOrderError(): TOrderError;
-    isOrderValid(): boolean;
-    isContactsValid(): boolean;
     clear(): void;
 }
 

@@ -2,7 +2,7 @@ import { IOrderData, IOrder, TOrderError } from "../../types";
 import { appEvents } from "../../utils/constants";
 import { Data } from "../base/Data";
 
-export class OrderData extends Data<IOrderData> {
+export class OrderData extends Data implements IOrderData{
     protected _order: IOrder = {
         payment: '',
         email: '',

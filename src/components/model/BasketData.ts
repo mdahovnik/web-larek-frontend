@@ -2,7 +2,7 @@ import { IBasketData, ICard, TBasketCard } from "../../types";
 import { appEvents } from "../../utils/constants";
 import { Data } from "../base/Data";
 
-export class BasketData extends Data<IBasketData>{
+export class BasketData extends Data implements IBasketData{
     protected _cards: ICard[] = [];
 
     add(card: ICard): void {
