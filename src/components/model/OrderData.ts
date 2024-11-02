@@ -3,7 +3,6 @@ import { appEvents } from "../../utils/constants";
 import { Data } from "../base/Data";
 
 export class OrderData extends Data<IOrderData> {
-    protected _orderErrors: TOrderError = {};
     protected _order: IOrder = {
         payment: '',
         email: '',
@@ -19,7 +18,7 @@ export class OrderData extends Data<IOrderData> {
     setField(field: keyof IOrder, value: string) {
         this._order[field] = value;
         this.validateOrder();
-        this.dataChanged(appEvents.orderDataChange, this._orderErrors);
+        this.dataChanged(appEvents.orderDataChange, this.getOrderError());
     }
 
     clear() {
@@ -31,27 +30,17 @@ export class OrderData extends Data<IOrderData> {
     }
 
     getOrderError(): TOrderError {
-        return this._orderErrors;
-    }
-
-    isOrderValid() {
-        return this._order.payment.length !== 0
-            && this._order.address.length !== 0;
-    }
-
-    isContactsValid() {
-        return this._order.email.length !== 0
-            && this._order.phone.length !== 0;
+        return this.validateOrder();
     }
 
     protected validateOrder() {
-        const errors: typeof this._orderErrors = {};
+        const errors: TOrderError = {};
 
         if (!this._order.payment) errors.payment = 'способ оплаты';
         if (!this._order.address) errors.address = 'адрес';
         if (!this._order.email) errors.email = 'email';
         if (!this._order.phone) errors.phone = 'телефон';
 
-        this._orderErrors = errors;
+        return errors;
     }
 }

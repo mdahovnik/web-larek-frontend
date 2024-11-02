@@ -7,7 +7,7 @@ export abstract class Data<T> {
         Object.assign(this, data);
     }
 
-    dataChanged(eventName: appEvents, payload?: object) {
+    protected dataChanged(eventName: appEvents, payload?: object) {
         this.event.emit(eventName, payload ?? {});
     }
 }

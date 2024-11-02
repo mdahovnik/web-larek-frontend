@@ -7,7 +7,7 @@ export class Form<T> extends View<T> {
     protected _submitButton: HTMLButtonElement;
     protected _containerName: string;
 
-    constructor(protected container: HTMLElement, protected events: IEvents) {
+    constructor(protected container: HTMLFormElement, protected events: IEvents) {
         super(container, events);
 
         this._submitButton = container.querySelector('button[type=submit]');

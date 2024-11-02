@@ -8,14 +8,14 @@ export class BasketData extends Data<IBasketData>{
     add(card: ICard): void {
         if (!this.contains(card.id)) {
             this._cards.unshift(card);
-            this.dataChanged(appEvents.basketDataChange, { data: this });
+            this.dataChanged(appEvents.basketDataChange);
         }
     }
 
     remove(id: string): void {
         if (this.contains(id)) {
             this._cards = this._cards.filter(item => item.id !== id);
-            this.dataChanged(appEvents.basketDataChange, { data: this });
+            this.dataChanged(appEvents.basketDataChange);
         }
     }
 
@@ -43,7 +43,7 @@ export class BasketData extends Data<IBasketData>{
 
     clear(): void {
         this._cards = [];
-        this.dataChanged(appEvents.basketDataChange, { data: this });
+        this.dataChanged(appEvents.basketDataChange);
     }
 
     getIdList(): string[] {

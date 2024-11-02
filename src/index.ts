@@ -108,16 +108,15 @@ events.on(appEvents.basketRemove, (item: TBasketCard) => {
 events.on(appEvents.basketDataChange, () => {
     basketView.render({
         cost: basket.getCost(),
-        cards: basket.getBasketViewCards().map((item) => {
-            const cardBasketType = new Card<TBasketCard>(cloneTemplate('#card-basket'), events, {
-                onClick: () => {
-                    events.emit(appEvents.basketRemove, item);
-                }
-            });
-            return cardBasketType.render({
-                ...item
-            });
-        })
+        cards: basket.getBasketViewCards()
+            .map((item) => {
+                const cardBasketType = new Card<TBasketCard>(cloneTemplate('#card-basket'), events, {
+                    onClick: () => { events.emit(appEvents.basketRemove, item); }
+                });
+                return cardBasketType.render({
+                    ...item
+                });
+            })
     });
 
     pageView.render({
@@ -164,9 +163,12 @@ events.on(appEvents.orderFormInput, (data: { field: keyof IOrder, value: string 
 
 events.on(appEvents.orderDataChange, (errors: Partial<IOrder>) => {
     const { payment, address } = errors;
+    const isOrderValid = !payment && !address;
 
     orderView.render({
-        valid: order.isOrderValid(),
+        payment: order.getOrder().payment,
+        address: order.getOrder().address,
+        valid: isOrderValid,
         error: getErrorMessage({
             payment,
             address
@@ -200,9 +202,12 @@ events.on(appEvents.contactsFormInput, (data: { field: keyof IOrder, value: stri
 
 events.on(appEvents.orderDataChange, (errors: Partial<IOrder>) => {
     const { email, phone } = errors;
+    const isContactsValid = !email && !phone;
 
     contactsView.render({
-        valid: order.isContactsValid(),
+        email: order.getOrder().email,
+        phone: order.getOrder().phone,
+        valid: isContactsValid,
         error: getErrorMessage({
             email,
             phone

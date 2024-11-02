@@ -7,37 +7,29 @@ import { IOrderForm } from "./ContactsForm";
 
 export class OrderForm extends Form<IOrderForm> {
     protected _orderButtons: HTMLButtonElement[];
-    protected _paymentType: string;
+    protected _address: HTMLInputElement;
 
     constructor(protected container: HTMLFormElement, protected events: IEvents) {
         super(container, events);
 
-        this._paymentType = '';
         this._orderButtons = ensureAllElements<HTMLButtonElement>('button[type=button]', container);
+        this._address = this.container.elements.namedItem('address') as HTMLInputElement;
         
         this._orderButtons?.forEach(button => {
             button.addEventListener('click', () => {
-                this._paymentType = button.name;
-                this._orderButtons.forEach(button => {
-                    this.toggleClass(button, 'button_alt-active', button.name === this._paymentType);
-                });
-
-                this.emitChanges(appEvents.orderPaymentSelect, { payment: this._paymentType });
+                this.emitChanges(appEvents.orderPaymentSelect, { payment: button.name });
             })
         })
     }
 
     set payment(value: string) {
-        this._paymentType = value;
-
-        if (isEmpty(value))
-            this._orderButtons.forEach(button => {
-                this.toggleClass(button, 'button_alt-active', false)
-            });
+        this._orderButtons.forEach(button => {
+            this.toggleClass(button, 'button_alt-active', button.name === value)
+        });
     }
 
     set address(value: string) {
-        (this.container.elements.namedItem('address') as HTMLInputElement).value = value;
+        this._address.value = value;
     }
 
 }
