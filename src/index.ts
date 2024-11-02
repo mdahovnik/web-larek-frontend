@@ -4,7 +4,7 @@ import { EventEmitter } from './components/base/events';
 import { CardsData } from './components/model/CardsData';
 import { LarekAPI } from './components/base/LarekAPI';
 import { Card, CardBasket, CardPreview } from './components/view/Card';
-import { ICard, IOrder, TBasketCard, TGalleryCard, TPayment } from './types';
+import { ICard, IOrder, TBasketCard, TPayment } from './types';
 import { Page } from './components/view/Page';
 import { cloneTemplate, ensureElement } from './utils/utils';
 import { Modal } from './components/view/Modal';
@@ -54,7 +54,7 @@ api.getProductList().then(data => {
  */
 events.on(appEvents.cardsListChanged, () => {
     pageView.render({
-        gallery: cards.getGalleryCards().map(item => {
+        gallery: cards.getCards().map(item => {
             const cardCatalogType = new Card<ICard>(cloneTemplate('#card-catalog'), events, {
                 onClick: () => {
                     events.emit(appEvents.cardPreviewChanged, item)
@@ -74,9 +74,9 @@ events.on(appEvents.cardsListChanged, () => {
 /**
  * CARD PREVIEW
  */
-events.on(appEvents.cardPreviewChanged, (item: TGalleryCard) => {
+events.on(appEvents.cardPreviewChanged, (item: ICard) => {
     const isInBasket = basket.contains(item.id);
-    cards.setSelectedCard(item.id);
+    // cards.setSelectedCard(item.id);
     const cardPreviewType = new CardPreview(cloneTemplate('#card-preview'), events, {
         onClick: () => {
             if (isInBasket)
@@ -90,7 +90,11 @@ events.on(appEvents.cardPreviewChanged, (item: TGalleryCard) => {
 
     modalView.render({
         content: cardPreviewType.render({
-            ...cards.getSelectedCard(),
+            category: item.category,
+            title: item.title,
+            image: item.image,
+            description: item.description,
+            price: item.price,
             canBuy: isInBasket
         })
     });
@@ -100,7 +104,7 @@ events.on(appEvents.cardPreviewChanged, (item: TGalleryCard) => {
 /**
  * BASKET
  */
-events.on(appEvents.basketAdd, (item: TGalleryCard) => {
+events.on(appEvents.basketAdd, (item: TBasketCard) => {
     basket.add(cards.getCard(item.id));
 })
 

@@ -1,4 +1,4 @@
-import { ICard, ICardsData, TGalleryCard } from "../../types";
+import { ICard, ICardsData } from "../../types";
 import { appEvents } from "../../utils/constants";
 import { Data } from "../base/Data";
 
@@ -24,13 +24,14 @@ export class CardsData extends Data<ICardsData> {
         return this._list.find(card => card.id === id)!;
     }
 
-    getGalleryCards(): TGalleryCard[] {
+    getCards(): ICard[] {
         return this._list.map((item) => {
             return {
                 id: item.id,
                 title: item.title,
                 price: item.price,
                 category: item.category,
+                description: item.description,
                 image: item.image
             }
         })

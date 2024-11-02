@@ -14,7 +14,7 @@ export interface ICardsData {
     setSelectedCard(id: string): void;
     getSelectedCard(): ICard;
     getCard(id: string): ICard;
-    getGalleryCards(): TGalleryCard[];
+    getCards(): ICard[];
 }
 
 export interface IBasketData {
@@ -50,8 +50,6 @@ export interface IOrderData {
 export type TPayment = 'card' | 'cash';
 
 export type TOrderError = Partial<Pick<IOrder, 'payment' | 'address' | 'email' | 'phone'>>
-
-export type TGalleryCard = Pick<ICard, 'image' | 'title' | 'category' | 'price' | 'id'>;
 
 export type TBasketCard = Pick<ICard & ICardBasket, 'title' | 'price' | 'id' | 'index'>;
 
