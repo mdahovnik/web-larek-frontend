@@ -1,3 +1,5 @@
+import { ICardBasket } from "../components/view/Card";
+
 export interface ICard {
     id: string;
     description: string;
@@ -5,8 +7,6 @@ export interface ICard {
     title: string;
     category: string;
     price: number;
-    canBuy: boolean;
-    index: number;
 }
 
 export interface ICardsData {
@@ -53,7 +53,7 @@ export type TOrderError = Partial<Pick<IOrder, 'payment' | 'address' | 'email' |
 
 export type TGalleryCard = Pick<ICard, 'image' | 'title' | 'category' | 'price' | 'id'>;
 
-export type TBasketCard = Pick<ICard, 'title' | 'price' | 'id' | 'index'>;
+export type TBasketCard = Pick<ICard & ICardBasket, 'title' | 'price' | 'id' | 'index'>;
 
 export type TOrderResponse = {
     id: string,

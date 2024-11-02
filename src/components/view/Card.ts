@@ -1,3 +1,4 @@
+import { ICard } from "../../types";
 import { CategoryColor } from "../../utils/constants";
 import { ensureElement } from "../../utils/utils";
 import { IEvents } from "../base/events";
@@ -14,7 +15,6 @@ export class Card<T> extends View<T> {
     protected _cardPrice: HTMLSpanElement;
     protected _cardText: HTMLParagraphElement;
     protected _button: HTMLButtonElement;
-    protected _index: HTMLElement;
 
     constructor(protected container: HTMLElement, events: IEvents, action?: ICArdAction) {
         super(container, events);
@@ -22,12 +22,14 @@ export class Card<T> extends View<T> {
         this._cardTitle = ensureElement<HTMLTitleElement>('.card__title', container);
         this._cardPrice = ensureElement('.card__price', container);
         this._cardImage = container.querySelector('.card__image');
-        this._index = container.querySelector('.basket__item-index');
         this._cardText = container.querySelector('.card__text');
         this._cardCategory = container.querySelector('.card__category');
         this._button = container.querySelector('.card__button');
 
-        this.container.addEventListener('click', () => { action?.onClick?.() });
+        if (!this._button)
+            this.container.addEventListener('click', () => { action?.onClick?.() });
+        else
+            this._button.addEventListener('click', () => { action?.onClick?.() });
     }
 
     set category(category: string) {
@@ -53,15 +55,6 @@ export class Card<T> extends View<T> {
         this.setText(this._cardText, value);
     }
 
-    set index(value: number) {
-        this.setText(this._index, value);
-    }
-
-    set canBuy(value: boolean) {
-        if (value && this._cardCategory)
-            this.setText(this._button, 'Удалить');
-    }
-
     protected setColor(category: string): void {
         const color = (Object.keys(CategoryColor) as (keyof typeof CategoryColor)[])
             .find(key => {
@@ -73,3 +66,37 @@ export class Card<T> extends View<T> {
 
 }
 
+export interface ICardPreview {
+    canBuy: boolean
+}
+
+export class CardPreview extends Card<ICardPreview & ICard> {
+    protected _canBuy: boolean;
+
+    constructor(protected container: HTMLElement, events: IEvents, action?: ICArdAction) {
+        super(container, events, action);
+    }
+
+    set canBuy(value: boolean) {
+        if (value && this._cardCategory)
+            this.setText(this._button, 'Удалить');
+    }
+}
+
+
+export interface ICardBasket {
+    index: number
+}
+
+export class CardBasket extends Card<ICardBasket & ICard> {
+    protected _index: HTMLElement;
+
+    constructor(protected container: HTMLElement, events: IEvents, action?: ICArdAction) {
+        super(container, events, action);
+        this._index = container.querySelector('.basket__item-index');
+    }
+
+    set index(value: number) {
+        this.setText(this._index, value);
+    }
+}

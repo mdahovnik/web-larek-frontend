@@ -3,7 +3,7 @@ import { API_URL, appEvents, CDN_URL, settings } from "./utils/constants";
 import { EventEmitter } from './components/base/events';
 import { CardsData } from './components/model/CardsData';
 import { LarekAPI } from './components/base/LarekAPI';
-import { Card } from './components/view/Card';
+import { Card, CardBasket, CardPreview } from './components/view/Card';
 import { ICard, IOrder, TBasketCard, TGalleryCard, TPayment } from './types';
 import { Page } from './components/view/Page';
 import { cloneTemplate, ensureElement } from './utils/utils';
@@ -55,13 +55,16 @@ api.getProductList().then(data => {
 events.on(appEvents.cardsListChanged, () => {
     pageView.render({
         gallery: cards.getGalleryCards().map(item => {
-            const cardCatalogType = new Card<TGalleryCard>(cloneTemplate('#card-catalog'), events, {
+            const cardCatalogType = new Card<ICard>(cloneTemplate('#card-catalog'), events, {
                 onClick: () => {
                     events.emit(appEvents.cardPreviewChanged, item)
                 }
             });
             return cardCatalogType.render({
-                ...item
+                category: item.category,
+                title: item.title,
+                image: item.image,
+                price: item.price
             });
         })
     });
@@ -74,7 +77,7 @@ events.on(appEvents.cardsListChanged, () => {
 events.on(appEvents.cardPreviewChanged, (item: TGalleryCard) => {
     const isInBasket = basket.contains(item.id);
     cards.setSelectedCard(item.id);
-    const cardPreviewType = new Card<ICard>(cloneTemplate('#card-preview'), events, {
+    const cardPreviewType = new CardPreview(cloneTemplate('#card-preview'), events, {
         onClick: () => {
             if (isInBasket)
                 events.emit(appEvents.basketRemove, item);
@@ -110,11 +113,13 @@ events.on(appEvents.basketDataChange, () => {
         cost: basket.getCost(),
         cards: basket.getBasketViewCards()
             .map((item) => {
-                const cardBasketType = new Card<TBasketCard>(cloneTemplate('#card-basket'), events, {
+                const cardBasketType = new CardBasket(cloneTemplate('#card-basket'), events, {
                     onClick: () => { events.emit(appEvents.basketRemove, item); }
                 });
                 return cardBasketType.render({
-                    ...item
+                    index: item.index,
+                    title: item.title,
+                    price: item.price
                 });
             })
     });
