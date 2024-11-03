@@ -1,10 +1,10 @@
 import './scss/styles.scss';
-import { API_URL, appEvents, CDN_URL, settings } from "./utils/constants";
+import { API_URL, APP_EVENTS, CDN_URL, settings } from "./utils/constants";
 import { EventEmitter } from './components/base/events';
 import { CardsData } from './components/model/CardsData';
 import { LarekAPI } from './components/base/LarekAPI';
 import { Card, CardBasket, CardPreview } from './components/view/Card';
-import { ICard, IOrder, TBasketCard, TPayment } from './types';
+import { ICard, IOrder, TBasketCard, TGalleryCard, TPayment, TPreviewCard } from './types';
 import { Page } from './components/view/Page';
 import { cloneTemplate, ensureElement } from './utils/utils';
 import { Modal } from './components/view/Modal';
@@ -24,9 +24,9 @@ const contactsTemplate = ensureElement<HTMLTemplateElement>('#contacts');
 const orderTemplate = ensureElement<HTMLTemplateElement>('#order');
 const successTemplate = ensureElement<HTMLTemplateElement>('#success');
 
-const cards = new CardsData( events);
-const basket = new BasketData( events);
-const order = new OrderData( events);
+const cards = new CardsData(events);
+const basket = new BasketData(events);
+const order = new OrderData(events);
 
 const pageView = new Page(ensureElement('.page'), events);
 const modalView = new Modal(ensureElement<HTMLElement>('#modal-container'), events);
@@ -52,19 +52,19 @@ api.getProductList().then(data => {
 /**
  * GALLERY
  */
-events.on(appEvents.cardsListChanged, () => {
+events.on(APP_EVENTS.cardsListChanged, () => {
     pageView.render({
         gallery: cards.getCards().map(item => {
-            const cardCatalogType = new Card<ICard>(cloneTemplate('#card-catalog'), events, {
+            const cardCatalogType = new Card<TGalleryCard>(cloneTemplate('#card-catalog'), events, {
                 onClick: () => {
-                    events.emit(appEvents.cardPreviewChanged, item)
+                    events.emit(APP_EVENTS.cardPreviewChanged, item)
                 }
             });
             return cardCatalogType.render({
                 category: item.category,
-                title: item.title,
                 image: item.image,
-                price: item.price
+                price: item.price,
+                title: item.title
             });
         })
     });
@@ -74,14 +74,14 @@ events.on(appEvents.cardsListChanged, () => {
 /**
  * CARD PREVIEW
  */
-events.on(appEvents.cardPreviewChanged, (item: ICard) => {
+events.on(APP_EVENTS.cardPreviewChanged, (item: ICard) => {
     const isInBasket = basket.contains(item.id);
     const cardPreviewType = new CardPreview(cloneTemplate('#card-preview'), events, {
         onClick: () => {
             if (isInBasket)
-                events.emit(appEvents.basketRemove, item);
+                events.emit(APP_EVENTS.basketRemove, item);
             else
-                events.emit(appEvents.basketAdd, item);
+                events.emit(APP_EVENTS.basketAdd, item);
 
             modalView.close();
         }
@@ -103,28 +103,27 @@ events.on(appEvents.cardPreviewChanged, (item: ICard) => {
 /**
  * BASKET
  */
-events.on(appEvents.basketAdd, (item: TBasketCard) => {
-    basket.add(cards.getCard(item.id));
+events.on(APP_EVENTS.basketAdd, (item: ICard) => {
+    basket.add(item);
 })
 
-events.on(appEvents.basketRemove, (item: TBasketCard) => {
+events.on(APP_EVENTS.basketRemove, (item: ICard) => {
     basket.remove(item.id);
 })
 
-events.on(appEvents.basketDataChange, () => {
+events.on(APP_EVENTS.basketDataChange, () => {
     basketView.render({
         cost: basket.getCost(),
-        cards: basket.getBasketViewCards()
-            .map((item) => {
-                const cardBasketType = new CardBasket(cloneTemplate('#card-basket'), events, {
-                    onClick: () => { events.emit(appEvents.basketRemove, item); }
-                });
-                return cardBasketType.render({
-                    index: item.index,
-                    title: item.title,
-                    price: item.price
-                });
-            })
+        cards: basket.getCards().map((item) => {
+            const cardBasketType = new CardBasket(cloneTemplate('#card-basket'), events, {
+                onClick: () => { events.emit(APP_EVENTS.basketRemove, item); }
+            });
+            return cardBasketType.render({
+                index: item.index,
+                title: item.title,
+                price: item.price
+            });
+        })
     });
 
     pageView.render({
@@ -132,7 +131,7 @@ events.on(appEvents.basketDataChange, () => {
     });
 })
 
-events.on(appEvents.basketOpen, () => {
+events.on(APP_EVENTS.basketOpen, () => {
     modalView.render({
         content: basketView.render({
             cost: basket.getCost()
@@ -140,7 +139,7 @@ events.on(appEvents.basketOpen, () => {
     });
 })
 
-events.on(appEvents.basketSubmit, () => {
+events.on(APP_EVENTS.basketSubmit, () => {
     order.clear();
     const { payment, address } = order.getOrderError();
 
@@ -161,15 +160,15 @@ events.on(appEvents.basketSubmit, () => {
 /**
  * ORDER FORM
  */
-events.on(appEvents.orderPaymentSelect, (data: { payment: TPayment }) => {
+events.on(APP_EVENTS.orderPaymentSelect, (data: { payment: TPayment }) => {
     order.setField('payment', data.payment);
 })
 
-events.on(appEvents.orderFormInput, (data: { field: keyof IOrder, value: string }) => {
+events.on(APP_EVENTS.orderFormInput, (data: { field: keyof IOrder, value: string }) => {
     order.setField(data.field, data.value);
 })
 
-events.on(appEvents.orderDataChange, (errors: Partial<IOrder>) => {
+events.on(APP_EVENTS.orderDataChange, (errors: Partial<IOrder>) => {
     const { payment, address } = errors;
     const isOrderValid = !payment && !address;
 
@@ -184,7 +183,7 @@ events.on(appEvents.orderDataChange, (errors: Partial<IOrder>) => {
     });
 })
 
-events.on(appEvents.orderFormSubmit, () => {
+events.on(APP_EVENTS.orderFormSubmit, () => {
     const { email, phone } = order.getOrderError();
 
     modalView.render({
@@ -204,11 +203,11 @@ events.on(appEvents.orderFormSubmit, () => {
 /**
  * CONTACTS FORM
  */
-events.on(appEvents.contactsFormInput, (data: { field: keyof IOrder, value: string }) => {
+events.on(APP_EVENTS.contactsFormInput, (data: { field: keyof IOrder, value: string }) => {
     order.setField(data.field, data.value)
 })
 
-events.on(appEvents.orderDataChange, (errors: Partial<IOrder>) => {
+events.on(APP_EVENTS.orderDataChange, (errors: Partial<IOrder>) => {
     const { email, phone } = errors;
     const isContactsValid = !email && !phone;
 
@@ -223,7 +222,7 @@ events.on(appEvents.orderDataChange, (errors: Partial<IOrder>) => {
     });
 })
 
-events.on(appEvents.contactsFormSubmit, () => {
+events.on(APP_EVENTS.contactsFormSubmit, () => {
     const orderData = Object.assign(
         { ...order.getOrder() },
         {
@@ -246,7 +245,7 @@ events.on(appEvents.contactsFormSubmit, () => {
 /**
  * ORDER STATUS
  */
-events.on(appEvents.orderSuccessSubmit, () => {
+events.on(APP_EVENTS.orderSuccessSubmit, () => {
     modalView.close();
 })
 
@@ -254,11 +253,11 @@ events.on(appEvents.orderSuccessSubmit, () => {
 /**
  * MODAL
  */
-events.on(appEvents.modalOpen, () => {
+events.on(APP_EVENTS.modalOpen, () => {
     pageView.locked = true;
 });
 
-events.on(appEvents.modalClose, () => {
+events.on(APP_EVENTS.modalClose, () => {
     pageView.locked = false;
 });
 

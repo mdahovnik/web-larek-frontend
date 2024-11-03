@@ -1,5 +1,5 @@
 import { IBasketData, ICard, TBasketCard } from "../../types";
-import { appEvents } from "../../utils/constants";
+import { APP_EVENTS } from "../../utils/constants";
 import { Data } from "../base/Data";
 
 export class BasketData extends Data implements IBasketData{
@@ -8,24 +8,23 @@ export class BasketData extends Data implements IBasketData{
     add(card: ICard): void {
         if (!this.contains(card.id)) {
             this._cards.unshift(card);
-            this.dataChanged(appEvents.basketDataChange);
+            this.dataChanged(APP_EVENTS.basketDataChange);
         }
     }
 
     remove(id: string): void {
         if (this.contains(id)) {
             this._cards = this._cards.filter(item => item.id !== id);
-            this.dataChanged(appEvents.basketDataChange);
+            this.dataChanged(APP_EVENTS.basketDataChange);
         }
     }
 
-    getBasketViewCards(): TBasketCard[] {
+    getCards(): TBasketCard[] {
         return this._cards.map((item, index) => {
             return {
-                id: item.id,
-                title: item.title,
+                index: index + 1,
                 price: item.price,
-                index: index + 1
+                title: item.title
             }
         })
     }
@@ -43,7 +42,7 @@ export class BasketData extends Data implements IBasketData{
 
     clear(): void {
         this._cards = [];
-        this.dataChanged(appEvents.basketDataChange);
+        this.dataChanged(APP_EVENTS.basketDataChange);
     }
 
     getIdList(): string[] {

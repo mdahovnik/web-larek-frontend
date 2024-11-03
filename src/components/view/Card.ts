@@ -1,4 +1,4 @@
-import { ICard } from "../../types";
+import { ICard, TBasketCard, TPreviewCard } from "../../types";
 import { CategoryColor } from "../../utils/constants";
 import { ensureElement } from "../../utils/utils";
 import { IEvents } from "../base/events";
@@ -67,11 +67,7 @@ export class Card<T> extends View<T> {
 }
 
 
-export interface ICardPreview {
-    canBuy: boolean
-}
-
-export class CardPreview extends Card<ICardPreview & ICard> {
+export class CardPreview extends Card<TPreviewCard> {
     constructor(protected container: HTMLElement, events: IEvents, action?: ICArdAction) {
         super(container, events, action);
     }
@@ -83,11 +79,7 @@ export class CardPreview extends Card<ICardPreview & ICard> {
 }
 
 
-export interface ICardBasket {
-    index: number
-}
-
-export class CardBasket extends Card<ICardBasket & ICard> {
+export class CardBasket extends Card<TBasketCard> {
     protected _index: HTMLElement;
 
     constructor(protected container: HTMLElement, events: IEvents, action?: ICArdAction) {

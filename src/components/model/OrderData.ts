@@ -1,5 +1,5 @@
 import { IOrderData, IOrder, TOrderError } from "../../types";
-import { appEvents } from "../../utils/constants";
+import { APP_EVENTS } from "../../utils/constants";
 import { Data } from "../base/Data";
 
 export class OrderData extends Data implements IOrderData{
@@ -18,7 +18,7 @@ export class OrderData extends Data implements IOrderData{
     setField(field: keyof IOrder, value: string) {
         this._order[field] = value;
         this.validateOrder();
-        this.dataChanged(appEvents.orderDataChange, this.getOrderError());
+        this.dataChanged(APP_EVENTS.orderDataChange, this.getOrderError());
     }
 
     clear() {
@@ -26,7 +26,7 @@ export class OrderData extends Data implements IOrderData{
             .forEach(key => { this._order[key] = '' });
 
         this.validateOrder();
-        this.dataChanged(appEvents.orderDataChange);
+        this.dataChanged(APP_EVENTS.orderDataChange);
     }
 
     getOrderError(): TOrderError {

@@ -1,4 +1,4 @@
-import { appEvents } from "../../utils/constants";
+import { APP_EVENTS } from "../../utils/constants";
 import { ensureElement } from "../../utils/utils";
 import { View } from "../base/View";
 import { IEvents } from "../base/events";
@@ -23,7 +23,7 @@ export class Basket extends View<IBasketContent> {
         this._basketItemIndex = container.querySelector('.basket__item-index');
 
         this._basketButton.addEventListener('click', () => {
-            this.emitChanges(appEvents.basketSubmit)
+            this.emitChanges(APP_EVENTS.basketSubmit)
         });
     }
 

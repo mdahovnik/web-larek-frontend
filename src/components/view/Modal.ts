@@ -1,4 +1,4 @@
-import { appEvents } from "../../utils/constants";
+import { APP_EVENTS } from "../../utils/constants";
 import { ensureElement } from "../../utils/utils";
 import { View } from "../base/View";
 import { IEvents } from "../base/events";
@@ -34,14 +34,14 @@ export class Modal extends View<IModalContent> {
     protected open() {
         this.toggleClass(this.container, 'modal_active', true);
         document.addEventListener('keyup', this.handleEscUp);
-        this.emitChanges(appEvents.modalOpen);
+        this.emitChanges(APP_EVENTS.modalOpen);
     }
 
     close() {
         this.toggleClass(this.container, 'modal_active', false);
         this.content = null;
         document.removeEventListener('keyup', this.handleEscUp);
-        this.emitChanges(appEvents.modalClose);
+        this.emitChanges(APP_EVENTS.modalClose);
     }
 
     protected handleEscUp(event: KeyboardEvent) {

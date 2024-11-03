@@ -14,7 +14,7 @@ export const CategoryColor = {
     button: "кнопка"
 }
 
-export enum appEvents {
+export enum APP_EVENTS {
     cardsListChanged = 'cards-list:changed',
     cardPreviewChanged = 'card-preview:changed',
     basketAdd = 'basket:add',

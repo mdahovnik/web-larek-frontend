@@ -1,13 +1,13 @@
-import { ICard, ICardsData } from "../../types";
-import { appEvents } from "../../utils/constants";
+import { ICard, ICardsData, TBasketCard} from "../../types";
+import { APP_EVENTS } from "../../utils/constants";
 import { Data } from "../base/Data";
 
-export class CardsData extends Data  implements ICardsData {
+export class CardsData extends Data implements ICardsData {
     protected _list: ICard[] = [];
 
     setCards(cards: ICard[]) {
         this._list = cards;
-        this.dataChanged(appEvents.cardsListChanged);
+        this.dataChanged(APP_EVENTS.cardsListChanged);
     }
 
     getCard(id: string) {
@@ -26,4 +26,5 @@ export class CardsData extends Data  implements ICardsData {
             }
         })
     }
+
 }

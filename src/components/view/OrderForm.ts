@@ -1,4 +1,4 @@
-import { appEvents } from "../../utils/constants";
+import { APP_EVENTS } from "../../utils/constants";
 import { ensureAllElements, isEmpty } from "../../utils/utils";
 import { IEvents } from "../base/events";
 import { Form } from "../common/Form";
@@ -17,7 +17,7 @@ export class OrderForm extends Form<IOrderForm> {
         
         this._orderButtons?.forEach(button => {
             button.addEventListener('click', () => {
-                this.emitChanges(appEvents.orderPaymentSelect, { payment: button.name });
+                this.emitChanges(APP_EVENTS.orderPaymentSelect, { payment: button.name });
             })
         })
     }
