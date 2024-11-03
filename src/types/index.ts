@@ -51,17 +51,11 @@ export type TOrderError = Partial<Pick<IOrder,
     'phone'
 >>
 
-export type TPreviewCard = Pick<ICard & { canBuy: boolean },
-    'canBuy' |
-    'category' |
-    'description' |
-    'image' |
-    'price' |
-    'title'
->;
+export type TPreviewCard = ICard & { canBuy: boolean };
 
 export type TGalleryCard = Pick<ICard,
     'category' |
+    'id' |
     'image' |
     'price' |
     'title'
@@ -69,6 +63,7 @@ export type TGalleryCard = Pick<ICard,
 
 export type TBasketCard = Pick<ICard & { index: number },
     'index' |
+    'id' |
     'price' |
     'title'
 >;

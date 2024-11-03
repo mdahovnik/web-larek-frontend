@@ -22,6 +22,7 @@ export class BasketData extends Data implements IBasketData{
     getCards(): TBasketCard[] {
         return this._cards.map((item, index) => {
             return {
+                id: item.id,
                 index: index + 1,
                 price: item.price,
                 title: item.title
