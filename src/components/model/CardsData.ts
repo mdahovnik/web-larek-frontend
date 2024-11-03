@@ -17,12 +17,7 @@ export class CardsData extends Data implements ICardsData {
     getCards(): ICard[] {
         return this._list.map((item) => {
             return {
-                id: item.id,
-                title: item.title,
-                price: item.price,
-                category: item.category,
-                description: item.description,
-                image: item.image
+                ...item
             }
         })
     }

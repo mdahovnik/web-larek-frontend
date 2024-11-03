@@ -4,7 +4,7 @@ import { EventEmitter } from './components/base/events';
 import { CardsData } from './components/model/CardsData';
 import { LarekAPI } from './components/base/LarekAPI';
 import { Card, CardBasket, CardPreview } from './components/view/Card';
-import { ICard, IOrder, TBasketCard, TGalleryCard, TPayment, TPreviewCard } from './types';
+import { ICard, IOrder, TGalleryCard, TPayment } from './types';
 import { Page } from './components/view/Page';
 import { cloneTemplate, ensureElement } from './utils/utils';
 import { Modal } from './components/view/Modal';
@@ -56,10 +56,9 @@ events.on(APP_EVENTS.cardsListChanged, () => {
     pageView.render({
         gallery: cards.getCards().map(item => {
             const cardCatalogType = new Card<TGalleryCard>(cloneTemplate('#card-catalog'), events, {
-                onClick: () => {
-                    events.emit(APP_EVENTS.cardPreviewChanged, item)
-                }
+                onClick: () => { events.emit(APP_EVENTS.cardPreviewChanged, item) }
             });
+
             return cardCatalogType.render({
                 category: item.category,
                 image: item.image,
