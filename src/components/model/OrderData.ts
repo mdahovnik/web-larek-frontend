@@ -17,7 +17,6 @@ export class OrderData extends Data implements IOrderData{
 
     setField(field: keyof IOrder, value: string) {
         this._order[field] = value;
-        this.validateOrder();
         this.dataChanged(APP_EVENTS.orderDataChange, this.getOrderError());
     }
 
@@ -25,7 +24,6 @@ export class OrderData extends Data implements IOrderData{
         (Object.keys(this._order) as (keyof typeof this._order)[])
             .forEach(key => { this._order[key] = '' });
 
-        this.validateOrder();
         this.dataChanged(APP_EVENTS.orderDataChange);
     }
 

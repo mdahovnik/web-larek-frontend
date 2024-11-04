@@ -62,7 +62,6 @@ export type TGalleryCard = Pick<ICard,
 >;
 
 export type TBasketCard = Pick<ICard & { index: number },
-    'index' |
     'id' |
     'price' |
     'title'

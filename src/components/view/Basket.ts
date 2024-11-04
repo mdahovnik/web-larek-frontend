@@ -10,7 +10,6 @@ export interface IBasketContent {
 
 export class Basket extends View<IBasketContent> {
     protected _cards: HTMLUListElement;
-    protected _basketItemIndex: HTMLSpanElement;
     protected _basketButton: HTMLButtonElement;
     protected _cost: HTMLElement;
 
@@ -20,7 +19,6 @@ export class Basket extends View<IBasketContent> {
         this._cards = ensureElement<HTMLUListElement>('.basket__list', container);
         this._basketButton = ensureElement<HTMLButtonElement>('.basket__button', container);
         this._cost = ensureElement('.basket__price', container);
-        this._basketItemIndex = container.querySelector('.basket__item-index');
 
         this._basketButton.addEventListener('click', () => {
             this.emitChanges(APP_EVENTS.basketSubmit)

@@ -33,7 +33,7 @@ export class Form<T> extends View<T> {
     }
 
     set valid(isValid: boolean) {
-        this._submitButton.toggleAttribute('disabled', !isValid);
+        this.setDisabled(this._submitButton, !isValid);
     }
 
     private showInputError(errorMessage: string) {

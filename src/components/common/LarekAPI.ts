@@ -1,5 +1,5 @@
 import { ICard, TInitCards, TOrderResponse, IOrder } from "../../types";
-import { Api } from "./api";
+import { Api } from "../base/api";
 
 
 export interface ILarekAPI {

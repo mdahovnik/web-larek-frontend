@@ -4,7 +4,7 @@ import { ensureElement } from "../../utils/utils";
 import { IEvents } from "../base/events";
 import { View } from "../base/View";
 
-interface ICArdAction {
+interface ICardAction {
     onClick: () => void;
 }
 
@@ -16,7 +16,7 @@ export class Card<T> extends View<T> {
     protected _cardText: HTMLParagraphElement;
     protected _button: HTMLButtonElement;
 
-    constructor(protected container: HTMLElement, events: IEvents, action?: ICArdAction) {
+    constructor(protected container: HTMLElement, events: IEvents, action?: ICardAction) {
         super(container, events);
 
         this._cardTitle = ensureElement<HTMLTitleElement>('.card__title', container);
@@ -32,7 +32,7 @@ export class Card<T> extends View<T> {
             this._button.addEventListener('click', () => { action?.onClick?.() });
     }
 
-    set category(category: string) {
+    set category(category: keyof typeof CategoryColor) {
         this.setText(this._cardCategory, category);
         this.setColor(category)
     }
@@ -55,20 +55,17 @@ export class Card<T> extends View<T> {
         this.setDisabled(this._button, Number(price) === 0)
     }
 
-    protected setColor(category: string): void {
-        const color = (Object.keys(CategoryColor) as (keyof typeof CategoryColor)[])
-            .find(key => {
-                return CategoryColor[key] === category
-            });
-
-        this.toggleClass(this._cardCategory, `card__category_${color}`, true);
+    protected setColor(category: keyof typeof CategoryColor): void {
+        const color = CategoryColor[category]
+        if (color)
+            this.toggleClass(this._cardCategory, `card__category_${color}`, true);
     }
 
 }
 
 
 export class CardPreview extends Card<TPreviewCard> {
-    constructor(protected container: HTMLElement, events: IEvents, action?: ICArdAction) {
+    constructor(protected container: HTMLElement, events: IEvents, action?: ICardAction) {
         super(container, events, action);
     }
 
@@ -78,11 +75,14 @@ export class CardPreview extends Card<TPreviewCard> {
     }
 }
 
+export interface ICardIndex {
+    index: number
+}
 
-export class CardBasket extends Card<TBasketCard> {
+export class CardBasket extends Card<TBasketCard & ICardIndex> {
     protected _index: HTMLElement;
 
-    constructor(protected container: HTMLElement, events: IEvents, action?: ICArdAction) {
+    constructor(protected container: HTMLElement, events: IEvents, action?: ICardAction) {
         super(container, events, action);
         this._index = container.querySelector('.basket__item-index');
     }

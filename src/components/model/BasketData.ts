@@ -2,7 +2,7 @@ import { IBasketData, ICard, TBasketCard } from "../../types";
 import { APP_EVENTS } from "../../utils/constants";
 import { Data } from "../base/Data";
 
-export class BasketData extends Data implements IBasketData{
+export class BasketData extends Data implements IBasketData {
     protected _cards: ICard[] = [];
 
     add(card: ICard): void {
@@ -20,10 +20,9 @@ export class BasketData extends Data implements IBasketData{
     }
 
     getCards(): TBasketCard[] {
-        return this._cards.map((item, index) => {
+        return this._cards.map((item) => {
             return {
                 id: item.id,
-                index: index + 1,
                 price: item.price,
                 title: item.title
             }
@@ -32,9 +31,10 @@ export class BasketData extends Data implements IBasketData{
 
     getCost(): number {
         if (!this._cards.length) return 0;
-        return this._cards
-            .map((item) => item.price)
-            .reduce((a, b) => a + b);
+        
+        return this._cards.reduce((accumulator, current) => {
+            return accumulator + current.price;
+        }, 0);
     }
 
     getQuantity(): number {

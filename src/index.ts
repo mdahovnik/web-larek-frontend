@@ -2,7 +2,7 @@ import './scss/styles.scss';
 import { API_URL, APP_EVENTS, CDN_URL, settings } from "./utils/constants";
 import { EventEmitter } from './components/base/events';
 import { CardsData } from './components/model/CardsData';
-import { LarekAPI } from './components/base/LarekAPI';
+import { LarekAPI } from './components/common/LarekAPI';
 import { Card, CardBasket, CardPreview } from './components/view/Card';
 import { ICard, IOrder, TGalleryCard, TPayment } from './types';
 import { Page } from './components/view/Page';
@@ -113,12 +113,12 @@ events.on(APP_EVENTS.basketRemove, (item: ICard) => {
 events.on(APP_EVENTS.basketDataChange, () => {
     basketView.render({
         cost: basket.getCost(),
-        cards: basket.getCards().map((item) => {
+        cards: basket.getCards().map((item, index) => {
             const cardBasketType = new CardBasket(cloneTemplate('#card-basket'), events, {
                 onClick: () => { events.emit(APP_EVENTS.basketRemove, item); }
             });
             return cardBasketType.render({
-                index: item.index,
+                index: index + 1,
                 title: item.title,
                 price: item.price
             });
@@ -168,16 +168,25 @@ events.on(APP_EVENTS.orderFormInput, (data: { field: keyof IOrder, value: string
 })
 
 events.on(APP_EVENTS.orderDataChange, (errors: Partial<IOrder>) => {
-    const { payment, address } = errors;
-    const isOrderValid = !payment && !address;
+    const { payment, address, email, phone } = errors;
 
     orderView.render({
         payment: order.getOrder().payment,
         address: order.getOrder().address,
-        valid: isOrderValid,
+        valid: !payment && !address,
         error: getErrorMessage({
             payment,
             address
+        })
+    });
+
+    contactsView.render({
+        email: order.getOrder().email,
+        phone: order.getOrder().phone,
+        valid: !email && !phone,
+        error: getErrorMessage({
+            email,
+            phone
         })
     });
 })
@@ -206,28 +215,12 @@ events.on(APP_EVENTS.contactsFormInput, (data: { field: keyof IOrder, value: str
     order.setField(data.field, data.value)
 })
 
-events.on(APP_EVENTS.orderDataChange, (errors: Partial<IOrder>) => {
-    const { email, phone } = errors;
-    const isContactsValid = !email && !phone;
-
-    contactsView.render({
-        email: order.getOrder().email,
-        phone: order.getOrder().phone,
-        valid: isContactsValid,
-        error: getErrorMessage({
-            email,
-            phone
-        })
-    });
-})
-
 events.on(APP_EVENTS.contactsFormSubmit, () => {
-    const orderData = Object.assign(
-        { ...order.getOrder() },
-        {
-            total: basket.getCost(),
-            items: basket.getIdList()
-        });
+    const orderData = {
+        ...order.getOrder(),
+        total: basket.getCost(),
+        items: basket.getIdList()
+    };
 
     api.placeOrder(orderData)
         .then(data => {

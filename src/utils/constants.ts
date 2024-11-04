@@ -7,11 +7,17 @@ export const settings = {
 
 
 export const CategoryColor = {
-    soft: "софт-скил",
-    hard: "хард-скил",
-    other: "другое",
-    additional: "дополнительное",
-    button: "кнопка"
+    // soft: "софт-скил",
+    // hard: "хард-скил",
+    // other: "другое",
+    // additional: "дополнительное",
+    // button: "кнопка"
+
+    "софт-скил": "soft",
+    "хард-скил": "hard",
+    "другое": "other",
+    "дополнительное": "additional",
+    "кнопка": "button"
 }
 
 export enum APP_EVENTS {
