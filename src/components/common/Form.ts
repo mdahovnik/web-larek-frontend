@@ -1,3 +1,4 @@
+import { APP_EVENTS } from "../../utils/constants";
 import { IEvents } from "../base/events";
 import { View } from "../base/View";
 
@@ -18,7 +19,7 @@ export class Form<T> extends View<T> {
             const input = (event.target as HTMLInputElement);
             const field = input.name;
             const value = input.value;
-            this.emitChanges(`${this._containerName}:input`, { field, value })
+            this.emitChanges(APP_EVENTS.formChange, { field, value })
         });
 
         this.container.addEventListener('submit', (evt) => {

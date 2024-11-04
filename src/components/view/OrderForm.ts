@@ -1,5 +1,5 @@
 import { APP_EVENTS } from "../../utils/constants";
-import { ensureAllElements, isEmpty } from "../../utils/utils";
+import { ensureAllElements } from "../../utils/utils";
 import { IEvents } from "../base/events";
 import { Form } from "../common/Form";
 import { IOrderForm } from "./ContactsForm";
@@ -14,10 +14,10 @@ export class OrderForm extends Form<IOrderForm> {
 
         this._orderButtons = ensureAllElements<HTMLButtonElement>('button[type=button]', container);
         this._address = this.container.elements.namedItem('address') as HTMLInputElement;
-        
+
         this._orderButtons?.forEach(button => {
             button.addEventListener('click', () => {
-                this.emitChanges(APP_EVENTS.orderPaymentSelect, { payment: button.name });
+                this.emitChanges(APP_EVENTS.formChange, { field: 'payment', value: button.name })
             })
         })
     }

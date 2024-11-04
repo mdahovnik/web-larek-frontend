@@ -7,12 +7,6 @@ export const settings = {
 
 
 export const CategoryColor = {
-    // soft: "софт-скил",
-    // hard: "хард-скил",
-    // other: "другое",
-    // additional: "дополнительное",
-    // button: "кнопка"
-
     "софт-скил": "soft",
     "хард-скил": "hard",
     "другое": "other",
@@ -29,7 +23,7 @@ export enum APP_EVENTS {
     basketOpen = 'basket:open',
     basketSubmit = 'basket:submit',
     orderPaymentSelect = 'order-payment:select',
-    orderFormInput = 'order-form:input',
+    formChange = 'form:change',
     orderDataChange = 'order-data:change',
     orderFormSubmit = 'order-form:submit',
     contactsFormInput = 'contacts-form:input',

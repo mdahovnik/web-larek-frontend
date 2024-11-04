@@ -3,8 +3,8 @@ import { API_URL, APP_EVENTS, CDN_URL, settings } from "./utils/constants";
 import { EventEmitter } from './components/base/events';
 import { CardsData } from './components/model/CardsData';
 import { LarekAPI } from './components/common/LarekAPI';
-import { Card, CardBasket, CardPreview } from './components/view/Card';
-import { ICard, IOrder, TGalleryCard, TPayment } from './types';
+import { CardBasket, CardGallery, CardPreview } from './components/view/Card';
+import { ICard, IOrder } from './types';
 import { Page } from './components/view/Page';
 import { cloneTemplate, ensureElement } from './utils/utils';
 import { Modal } from './components/view/Modal';
@@ -55,7 +55,7 @@ api.getProductList().then(data => {
 events.on(APP_EVENTS.cardsListChanged, () => {
     pageView.render({
         gallery: cards.getCards().map(item => {
-            const cardCatalogType = new Card<TGalleryCard>(cloneTemplate('#card-catalog'), events, {
+            const cardCatalogType = new CardGallery(cloneTemplate('#card-catalog'), events, {
                 onClick: () => { events.emit(APP_EVENTS.cardPreviewChanged, item) }
             });
 
@@ -132,9 +132,7 @@ events.on(APP_EVENTS.basketDataChange, () => {
 
 events.on(APP_EVENTS.basketOpen, () => {
     modalView.render({
-        content: basketView.render({
-            cost: basket.getCost()
-        })
+        content: basketView.render()
     });
 })
 
@@ -143,67 +141,33 @@ events.on(APP_EVENTS.basketSubmit, () => {
     const { payment, address } = order.getOrderError();
 
     modalView.render({
-        content: orderView.render({
-            payment: order.getOrder().payment,
-            address: order.getOrder().address,
-            valid: false,
-            error: getErrorMessage({
-                payment,
-                address
-            })
-        })
+        content: orderViewRender(payment, address)
     });
 })
 
+/**
+ * FORM
+ */
+events.on(APP_EVENTS.formChange, (data: { field: keyof IOrder, value: string }) => {
+    order.setField(data.field, data.value);
+})
 
 /**
  * ORDER FORM
  */
-events.on(APP_EVENTS.orderPaymentSelect, (data: { payment: TPayment }) => {
-    order.setField('payment', data.payment);
-})
-
-events.on(APP_EVENTS.orderFormInput, (data: { field: keyof IOrder, value: string }) => {
-    order.setField(data.field, data.value);
-})
-
 events.on(APP_EVENTS.orderDataChange, (errors: Partial<IOrder>) => {
     const { payment, address, email, phone } = errors;
 
-    orderView.render({
-        payment: order.getOrder().payment,
-        address: order.getOrder().address,
-        valid: !payment && !address,
-        error: getErrorMessage({
-            payment,
-            address
-        })
-    });
-
-    contactsView.render({
-        email: order.getOrder().email,
-        phone: order.getOrder().phone,
-        valid: !email && !phone,
-        error: getErrorMessage({
-            email,
-            phone
-        })
-    });
+    orderViewRender(payment, address);
+    contactsViewRender(email, phone)
 })
+
 
 events.on(APP_EVENTS.orderFormSubmit, () => {
     const { email, phone } = order.getOrderError();
 
     modalView.render({
-        content: contactsView.render({
-            email: order.getOrder().email,
-            phone: order.getOrder().phone,
-            valid: false,
-            error: getErrorMessage({
-                email,
-                phone
-            })
-        })
+        content: contactsViewRender(email, phone)
     });
 })
 
@@ -211,10 +175,6 @@ events.on(APP_EVENTS.orderFormSubmit, () => {
 /**
  * CONTACTS FORM
  */
-events.on(APP_EVENTS.contactsFormInput, (data: { field: keyof IOrder, value: string }) => {
-    order.setField(data.field, data.value)
-})
-
 events.on(APP_EVENTS.contactsFormSubmit, () => {
     const orderData = {
         ...order.getOrder(),
@@ -259,4 +219,27 @@ function getErrorMessage(errors: Partial<IOrder>): string {
         .join(' и ');
 }
 
+function orderViewRender(payment: string, address: string): HTMLElement {
+    return orderView.render({
+        payment: order.getOrder().payment,
+        address: order.getOrder().address,
+        valid: !payment && !address,
+        error: getErrorMessage({
+            payment,
+            address
+        })
+    });
+}
+
+function contactsViewRender(email: string, phone: string): HTMLElement {
+    return contactsView.render({
+        email: order.getOrder().email,
+        phone: order.getOrder().phone,
+        valid: !email && !phone,
+        error: getErrorMessage({
+            email,
+            phone
+        })
+    });
+}
 

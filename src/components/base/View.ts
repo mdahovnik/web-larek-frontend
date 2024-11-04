@@ -1,6 +1,10 @@
 import { IEvents } from "./events";
 
-export abstract class View<T> {
+export interface IRender{
+    render():HTMLElement
+}
+
+export abstract class View<T> implements IRender {
     constructor(protected readonly container: HTMLElement, protected events: IEvents) { }
 
     protected emitChanges(event: string, payload?: object) {
