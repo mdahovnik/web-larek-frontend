@@ -1,4 +1,4 @@
-import { IBasketData, ICard, TBasketCard } from "../../types";
+import { IBasketData, ICard, TCardBasket } from "../../types";
 import { APP_EVENTS } from "../../utils/constants";
 import { Data } from "../base/Data";
 
@@ -19,7 +19,7 @@ export class BasketData extends Data implements IBasketData {
         }
     }
 
-    getCards(): TBasketCard[] {
+    getCards(): TCardBasket[] {
         return this._cards.map((item) => {
             return {
                 id: item.id,

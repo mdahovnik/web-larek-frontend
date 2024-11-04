@@ -1,4 +1,3 @@
-
 export interface ICard {
     id: string;
     description: string;
@@ -41,35 +40,6 @@ export interface IOrderData {
     clear(): void;
 }
 
-
-export type TPayment = 'card' | 'cash';
-
-export type TOrderError = Partial<Pick<IOrder,
-    'address' |
-    'email' |
-    'payment' |
-    'phone'
->>
-
-export type TPreviewCard = Pick<ICard & { canBuy: boolean },
-    'description' |
-    'canBuy'
->;
-
-export type TGalleryCard = Pick<ICard,
-    'category' |
-    'image' |
-    'price' |
-    'title'
->;
-
-export type TBasketCard = Pick<ICard & { index: number },
-    'id' |
-    'price' |
-    'title'
-// 'index'
->;
-
 export type TOrderResponse = {
     id: string,
     total: number
@@ -79,3 +49,9 @@ export type TInitCards = {
     total: number,
     items: ICard[]
 };
+
+export type TPayment = 'card' | 'cash';
+export type TOrderError = Partial<Pick<IOrder, 'address' | 'email' | 'payment' | 'phone'>>;
+export type TCardPreview = Pick<ICard, 'description'>;
+export type TCardBasket = Pick<ICard, 'price' | 'title'>;
+export type TCardGallery = Pick<ICard, 'category' | 'image' | 'price' | 'title'>;

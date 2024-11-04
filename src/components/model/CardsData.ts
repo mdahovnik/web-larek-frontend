@@ -1,4 +1,4 @@
-import { ICard, ICardsData, TBasketCard} from "../../types";
+import { ICard, ICardsData} from "../../types";
 import { APP_EVENTS } from "../../utils/constants";
 import { Data } from "../base/Data";
 

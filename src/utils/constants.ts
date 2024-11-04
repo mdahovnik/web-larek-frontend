@@ -5,7 +5,6 @@ export const settings = {
 
 };
 
-
 export const CategoryColor = {
     "софт-скил": "soft",
     "хард-скил": "hard",

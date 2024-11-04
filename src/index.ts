@@ -54,12 +54,12 @@ api.getProductList().then(data => {
  */
 events.on(APP_EVENTS.cardsListChanged, () => {
     pageView.render({
-        gallery: cards.getCards().map(item => {
-            const cardCatalogType = new CardGallery(cloneTemplate('#card-catalog'), events, {
+        content: cards.getCards().map(item => {
+            const cardGalleryType = new CardGallery(cloneTemplate('#card-catalog'), events, {
                 onClick: () => { events.emit(APP_EVENTS.cardPreviewChanged, item) }
             });
 
-            return cardCatalogType.render({
+            return cardGalleryType.render({
                 category: item.category,
                 image: item.image,
                 price: item.price,
@@ -159,9 +159,8 @@ events.on(APP_EVENTS.orderDataChange, (errors: Partial<IOrder>) => {
     const { payment, address, email, phone } = errors;
 
     orderViewRender(payment, address);
-    contactsViewRender(email, phone)
+    contactsViewRender(email, phone);
 })
-
 
 events.on(APP_EVENTS.orderFormSubmit, () => {
     const { email, phone } = order.getOrderError();

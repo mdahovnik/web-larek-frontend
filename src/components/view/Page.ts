@@ -4,7 +4,7 @@ import { View } from "../base/View";
 import { IEvents } from "../base/events";
 
 interface IPage {
-    gallery: HTMLElement[];
+    content: HTMLElement[];
     count: number;
     locked: boolean;
 }
@@ -28,7 +28,7 @@ export class Page extends View<IPage> {
         });
     }
 
-    set gallery(elements: HTMLElement[]) {
+    set content(elements: HTMLElement[]) {
         this._gallery.replaceChildren(...elements);
     }
 
